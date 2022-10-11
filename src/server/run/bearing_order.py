@@ -15,7 +15,7 @@ class BearingOrderMachineInfo(TypedDict):
 
 class BearingOrderItemsInfo(TypedDict):
     itemNum: str 
-    type: Literal["ｺﾞﾑ胴", "版胴", "圧胴", "渡胴", "ｺｰﾀｰｺﾞﾑ"] 
+    type: Literal["ｺﾞﾑ胴", "版胴", "圧胴", "渡胴", "ｺｰﾀｰｺﾞﾑ","A渡胴", "DU胴", "NO胴",]     
     locatios: list[str]
 
 class BearingOrderFileInfo(TypedDict):

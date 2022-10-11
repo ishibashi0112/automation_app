@@ -160,6 +160,7 @@ export const BearingOrder = () => {
                         "ｺｰﾀｰｺﾞﾑ",
                         "A渡胴",
                         "DU胴",
+                        "NO胴",
                       ]}
                       {...form.getInputProps(`items.${i}.type`)}
                     />
