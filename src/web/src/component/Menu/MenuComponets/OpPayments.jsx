@@ -1,5 +1,5 @@
 import React from "react";
-import { Select, NumberInput, TextInput } from "@mantine/core";
+import { Select, NumberInput, TextInput, Button } from "@mantine/core";
 import { LoginInput } from "./LoginInput";
 import { useMenuForm } from "../../../hook/useMenuForm";
 import { useSharedState } from "../../../hook/useSharedState";
@@ -35,7 +35,11 @@ export const OpPayments = () => {
           description="備考欄に記載する自分のイニシャルを入力"
           {...form.getInputProps("nameInitial")}
         />
+        <Button className="mt-4" type="submit" variant="filled">
+          実行する
+        </Button>
       </div>
+
       {OverLay}
 
       {resultView}
