@@ -222,7 +222,6 @@ export const BearingOrder = () => {
             label="嵌合検査表"
             description="使用するファイルを選択"
             placeholder="file"
-            required
           />
 
           <Textarea

@@ -125,7 +125,6 @@ def bearing_order(
 
     try:
         bo = BearingOrder(id, password, orderNum, linesNum, customerName, machineInfo, items, deliveryTime, file, description)
-
         bo.create_order_sheet()
         bo.send_order_email()
 
