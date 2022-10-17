@@ -32,7 +32,7 @@ def op_aborad(settings_items: list[RuleItemsType], id: str, password: str, start
                     continue
 
                 # 設定より特有のルールがある場合
-                unique_rule = op.get_unique_rule(i, settings_items)
+                unique_rule = op.get_unique_rule(i)
                 if unique_rule:
                     if unique_rule["rule"] == '処理をスルー':
                         continue
