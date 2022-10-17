@@ -40,7 +40,7 @@ class Rd(ServiceSystemOperation):
         for i, _ in enumerate(results_els):          
             if not super().get_value(get_id("ｽﾃｰﾀｽ_rd_results", i)) == "未引当":
 
-                break
+                continue
 
             super().btn_click(get_id("削除_rd_results", i))
     
