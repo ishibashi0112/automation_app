@@ -58,7 +58,7 @@ export const App = () => {
         header={<Header drawerToggle={drawerToggle} />}
         navbarOffsetBreakpoint="sm"
       >
-        <Container size="lg">
+        <Container size="md">
           <Main mainMenu={mainMenu} />
         </Container>
       </AppShell>
