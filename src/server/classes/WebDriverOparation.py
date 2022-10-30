@@ -8,6 +8,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.remote.webelement import WebElement
+from webdriver_manager.microsoft import EdgeChromiumDriverManager
 
 
 
@@ -16,8 +17,13 @@ class WebDriverOparation:
     def set_up(self) -> None:
         chrome_service = fs.Service(executable_path=ChromeDriverManager().install())
         options = Options()
-        options.add_experimental_option("detach",True)
+        options.add_experimental_option("detach", True)
         self.brower = webdriver.Chrome(service=chrome_service,options=options)
+        self.wait =  WebDriverWait(self.brower , 15)
+    
+    def edge_set_up(self) -> None:
+        edge_service = fs.Service(executable_path=EdgeChromiumDriverManager().install())
+        self.brower = webdriver.Edge(service=edge_service)
         self.wait =  WebDriverWait(self.brower , 15)
  
     def open_main_page(self, url: str) -> None:

@@ -20,7 +20,7 @@ import { useSharedState } from "../../../hook/useSharedState";
 import { useMenuForm } from "../../../hook/useMenuForm";
 
 export const RepairOrder = () => {
-  const [value, setValue] = useState("ﾌｧｲﾙ");
+  const [value, setValue] = useState("folder");
   const [files, setFiles] = useState([]);
   const [previews, setPreviews] = useState([]);
   const [isOcrLoading, setIsOcrLoading] = useState(false);
@@ -28,35 +28,43 @@ export const RepairOrder = () => {
   const { form, handleOnSubmit, isLoading, OverLay, resultView } =
     useMenuForm(menu);
 
-  const handleClickOCR = useCallback(async () => {
-    setIsOcrLoading(true);
+  const handleClickOCR = useCallback(
+    async (e) => {
+      setIsOcrLoading(true);
 
-    const encoded_Files = await Promise.all(
-      files.map(async (file) => base64Encode(file))
-    );
-
-    const repairOrderData = await window["eel"].ocr_for_repair_order_pdf(
-      encoded_Files
-    )();
-
-    repairOrderData.info.map((data, i) => {
-      if (!i) {
-        form.setFieldValue("orders.0.orderNum", data.orderNum);
-        form.setFieldValue("orders.0.linesNum", data.linesNum);
-        form.setFieldValue("orders.0.itemNum", data.itemNum);
+      let repairOrderData;
+      if (e.currentTarget.innerText === "新規ﾌｫﾙﾀﾞからﾃｷｽﾄ抽出") {
+        repairOrderData = await window["eel"].ocr_for_repair_order_pdf()();
       } else {
-        form.insertListItem("orders", {
-          orderNum: data.orderNum,
-          linesNum: data.linesNum,
-          itemNum: data.itemNum,
-        });
-      }
-    });
+        const encoded_Files = await Promise.all(
+          files.map(async (file) => base64Encode(file))
+        );
 
-    setPreviews(repairOrderData.images);
-    setFiles([]);
-    setIsOcrLoading(false);
-  }, [form, files]);
+        repairOrderData = await window["eel"].ocr_for_repair_order_pdf(
+          encoded_Files
+        )();
+      }
+
+      repairOrderData.info.map((data, i) => {
+        if (!i) {
+          form.setFieldValue("orders.0.orderNum", data.orderNum);
+          form.setFieldValue("orders.0.linesNum", data.linesNum);
+          form.setFieldValue("orders.0.itemNum", data.itemNum);
+        } else {
+          form.insertListItem("orders", {
+            orderNum: data.orderNum,
+            linesNum: data.linesNum,
+            itemNum: data.itemNum,
+          });
+        }
+      });
+
+      setPreviews(repairOrderData.images);
+      setFiles([]);
+      setIsOcrLoading(false);
+    },
+    [form, files]
+  );
 
   const [isSubWindowOpen, setIsSubWindowOpen] = useState(false);
 
@@ -75,13 +83,68 @@ export const RepairOrder = () => {
 
         <Divider my="lg" size="sm" labelPosition="center" label="手配情報" />
 
-        <SegmentedControl
-          size="xs"
-          data={["ﾏﾆｭｱﾙ", "ﾌｧｲﾙ"]}
-          value={value}
-          onChange={setValue}
-        />
-        {value === "ﾏﾆｭｱﾙ" ? (
+        <div className="flex flex-col gap-3">
+          <SegmentedControl
+            className="w-80"
+            value={value}
+            size="xs"
+            onChange={setValue}
+            data={[
+              { label: "ﾌｫﾙﾀﾞ", value: "folder" },
+              { label: "ﾌｧｲﾙ", value: "files" },
+            ]}
+          />
+          {value === "folder" ? (
+            <div>
+              <Button
+                className="mr-3"
+                size="xs"
+                variant="light"
+                onClick={handleClickOCR}
+                loading={isOcrLoading}
+              >
+                新規ﾌｫﾙﾀﾞからﾃｷｽﾄ抽出
+              </Button>
+              <Button
+                size="xs"
+                variant="light"
+                disabled={previews.length > 0 ? false : true}
+                onClick={() => setIsSubWindowOpen((o) => !o)}
+              >
+                ﾌﾟﾚﾋﾞｭｰ表示
+              </Button>
+            </div>
+          ) : (
+            <>
+              <FullScreenDropZoneInput
+                label="PDF Filse"
+                multiple
+                setFiles={setFiles}
+              />
+
+              <div className="ml-auto mt-2">
+                <Button
+                  className="w-24 mr-2"
+                  size="xs"
+                  variant="light"
+                  onClick={handleClickOCR}
+                  loading={isOcrLoading}
+                  disabled={files.length ? false : true}
+                >
+                  ﾃｷｽﾄ抽出
+                </Button>
+                <Button
+                  className="w-24"
+                  size="xs"
+                  variant="light"
+                  disabled={previews.length > 0 ? false : true}
+                  onClick={() => setIsSubWindowOpen((o) => !o)}
+                >
+                  ﾌﾟﾚﾋﾞｭｰ表示
+                </Button>
+              </div>
+            </>
+          )}
           <Table>
             <thead className="text-sm">
               <tr>
@@ -114,7 +177,7 @@ export const RepairOrder = () => {
                     />
                   </td>
                   <td>
-                    {i ? (
+                    {form.values.orders.length > 1 ? (
                       <ActionIcon
                         color="red"
                         onClick={() => form.removeListItem("orders", i)}
@@ -146,84 +209,7 @@ export const RepairOrder = () => {
               </tr>
             </tfoot>
           </Table>
-        ) : null}
-        {value === "ﾌｧｲﾙ" ? (
-          <div className="flex flex-col">
-            <FullScreenDropZoneInput
-              label="PDF Filse"
-              multiple
-              setFiles={setFiles}
-            />
-
-            <div className="ml-auto mt-2">
-              <Button
-                className="w-24 mr-2"
-                size="xs"
-                variant="light"
-                onClick={handleClickOCR}
-                loading={isOcrLoading}
-                disabled={files.length ? false : true}
-              >
-                ﾃｷｽﾄ抽出
-              </Button>
-              <Button
-                className="w-24"
-                size="xs"
-                variant="light"
-                disabled={previews.length > 0 ? false : true}
-                onClick={() => setIsSubWindowOpen((o) => !o)}
-              >
-                ﾌﾟﾚﾋﾞｭｰ表示
-              </Button>
-            </div>
-
-            <Table>
-              <thead className="text-sm">
-                <tr>
-                  <td>受注NO</td>
-                  <td>行NO</td>
-                  <td>品番</td>
-                  <td></td>
-                </tr>
-              </thead>
-              <tbody>
-                {form.values.orders.map((_, i) => (
-                  <tr key={i}>
-                    <td>
-                      <TextInput
-                        {...form.getInputProps(`orders.${i}.orderNum`)}
-                        required
-                      />
-                    </td>
-                    <td>
-                      <TextInput
-                        className="max-w-[70px]"
-                        required
-                        {...form.getInputProps(`orders.${i}.linesNum`)}
-                      />
-                    </td>
-                    <td>
-                      <TextInput
-                        required
-                        {...form.getInputProps(`orders.${i}.itemNum`)}
-                      />
-                    </td>
-                    <td>
-                      {i ? (
-                        <ActionIcon
-                          color="red"
-                          onClick={() => form.removeListItem("orders", i)}
-                        >
-                          <RiDeleteBin2Line />
-                        </ActionIcon>
-                      ) : null}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
-          </div>
-        ) : null}
+        </div>
 
         <Button className="mt-4" type="submit" variant="filled">
           実行する

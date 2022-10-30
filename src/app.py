@@ -8,6 +8,7 @@ load_dotenv()
 import os
 import re
 from typing import Any, Optional, TypedDict
+from pathlib import Path
 import eel
 import datetime
 import jpholiday
@@ -137,9 +138,7 @@ def pillow_to_base64(img, format="jpeg") -> str:
 
 
 @eel.expose
-def ocr_for_repair_order_pdf(pdf_files: list[str]) -> OcrResult:
-    decoded_pdf_files: list[bytes] =[ base64.b64decode(file) for file in pdf_files]
-
+def ocr_for_repair_order_pdf(pdf_files: list[str] = []) -> OcrResult:
     #pyocrにTesseractを指定する。
     pyocr.tesseract.TESSERACT_CMD = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
     poppler_path = r"C:\Program Files\poppler-22.04.0\Library\bin"
@@ -148,6 +147,19 @@ def ocr_for_repair_order_pdf(pdf_files: list[str]) -> OcrResult:
     tool = tools[0]
     builder = pyocr.builders.TextBuilder(tesseract_layout=3)
     lang = "jpn"
+    
+    decoded_pdf_files: Any = []
+    if len(pdf_files):
+        decoded_pdf_files = [base64.b64decode(file) for file in pdf_files]
+
+    else:
+        path: Path = Path("Y:\\530_資材事業課\\パーツセンター\\★部品管理係★\\１０．預かり修理品票\\（新規）預かり修理")
+        dir_g = path.iterdir()
+        
+        for file in dir_g:
+            with file.open("rb") as f:
+                file_bytes: bytes = f.read()
+                decoded_pdf_files.append(file_bytes)
 
     repair_order_info_list = []
     img_list = []
