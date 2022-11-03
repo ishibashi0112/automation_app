@@ -169,7 +169,7 @@ def create_excel(excel_data_list: list, header_list: list[str], file_path: str) 
             except KeyError:
                 ws.cell(y+2, x+1).value = ""
     # ﾌｨﾙﾀｰ設定
-    ws.auto_filter.ref = f"A1:X{ws.max_row}"
+    ws.auto_filter.ref = f"A1:AI{ws.max_row}"
     # header固定
     ws.freeze_panes = 'A2'
 

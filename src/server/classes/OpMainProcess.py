@@ -1,3 +1,5 @@
+import collections
+from functools import reduce
 import os
 from server.classes.Op import Op
 from server.classes.OpKoutei import OpKoutei
@@ -197,14 +199,33 @@ class OpMainProcess(Op):
             self.update_duplicate_item_lib(item_num_lib)
             self.add_to_duplicate_item_list()
     
-    def aaa(self):
+    def update_duplicate_state_in_excel_data(self) -> None:
+        def update_list(prev_list, current_excel_dict):
+            current_item_num = current_excel_dict["品番"]
+            
+            if current_item_num in target_item_num_list:
+                new_excel_dict = current_excel_dict | {"重複": "○"}
+
+                return [*prev_list, new_excel_dict]
+
+            return [*prev_list, current_excel_dict]
         
-    
+        duplicate_item_num_list = [ item_dict.get("品番") for item_dict in self.duplicate_item_list]
+        item_num_counter_dict = dict(collections.Counter(duplicate_item_num_list))
+        target_item_num_list = [ item[0] for item in item_num_counter_dict.items() if item[1] > 1]
+
+        new_excel_list: Any = list(reduce(update_list, self.excel_list, []))
+        self.excel_list = new_excel_list
+
+
+           
 
     def new_excel(self) -> None:
+        self.update_duplicate_state_in_excel_data()
+        
         header_list: Final[list[str]] = [
             "対応","客先名","受注NO","行NO","page","品番","品名",
-            "仕様","数量","LOT","未引当数","発注数","受注数","実利2","要確認1","要確認2",
+            "仕様","数量","LOT","未引当数","発注数","受注数","実利2","要確認1","要確認2","重複",
             "単価","製番","納期","修理日","LT","区分","工程数","取引先code",
             "取引先名","備考"
         ]
