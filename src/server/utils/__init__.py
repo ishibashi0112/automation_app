@@ -2,28 +2,7 @@ from typing import Any, Final, Literal, Optional
 from openpyxl import Workbook
 from openpyxl import styles
 
-from server.function import get_download_path, today_str
-
-
-ElementIdTypes = Literal[
-    "新規追加_radio_btn_op_search","受注NO_op_search","品番_op_search","計画区分_op_search", "内示_op_search","検索_op_search","クリア_op_search","新規追加_op_search",
-    "受注NO_op_results","行NO_op_results","品番_op_results","品名_op_results","仕様_op_results","数量_op_results","LOT_op_results","科目_op_results",
-    "L/T_op_results","製番_op_results","備考_op_results","緊急度_op_results","支給品ﾌﾗｸﾞ_op_results","生産中止ﾌﾗｸﾞ_op_results","EDIﾌﾗｸﾞ_op_results","受注者ｺｰﾄﾞ_op_results",
-    "工程_op_results","支給_op_results","更新_op_results","削除_op_results","内示_op_results","確定check_op_results","確認_op_results","確定_op_results",
-    "工程NO_op_KOUTEI","単価_op_KOUTEI","単区_op_KOUTEI","単価未設定_op_KOUTEI","納期_op_KOUTEI","確認_op_KOUTEI","確定_op_KOUTEI","取引先code_op_KOUTEI","取引先名_op_KOUTEI",
-    "EDI_op_KOUTEI","品番_op_payments","品名_op_payments","仕様_op_payments","数量_op_payments","確認_op_payments","確定_op_payments","拠点_obi_search","品番_obi_search","品名_obi_search",
-    "仕様_obi_search","検索_obi_search","確認_op_footer","確定_op_footer","明細追加_op_footer","再表示_op_footer","受注NO_obi_results","行NO_obi_results","数量_obi_results",
-    "製番_obi_results","受注担当者_obi_results","ｽﾃｰﾀｽ_obi_results","受注数_obi_results","発注数_obi_results","実利1_obi_results","実利2_obi_results","区分_obi_results",
-    "客先ｺｰﾄﾞ_obi_results","客先名_obi_results","取引種別_obi_results","品番_ha_search","検索_ha_search","受注NO_ha_results","行NO_ha_results","変更_ha_results","修理日_obi_results",
-    "削除_ha_results","確認_ha_results","確定_ha_results","品番_rd_header","品番_rd_search","検索_rd_search","確認_rd_results","確定_rd_results","削除_rd_results","ｽﾃｰﾀｽ_rd_results",
-    "確認_rd_footer","確定_rd_footer","確認_ij_search",
-]
-
-ElementXpathTypes = Literal["ﾍﾟｰｼﾞ_op_results","ﾍﾟｰｼﾞ_Next_btn_op_results","検索結果_obi_results","ﾍﾟｰｼﾞ_Next_btn_obi_results","検索結果_ha_results","検索結果_rd_results"
-
-] 
-
-def get_id(key: ElementIdTypes, i: int=0) ->  Optional[str]:
+def get_id(key: Any, i: int=0) ->  Optional[str]:
     id_text: Final[str] = f"{i+2}" if len(str(i+2)) == 2 else f"0{i+2}"
 
     element_ids: Final[dict[str, str]] = {
@@ -151,7 +130,7 @@ def get_id(key: ElementIdTypes, i: int=0) ->  Optional[str]:
     else:
         return None
 
-def get_xpath(key: ElementXpathTypes) -> Optional[str]:
+def get_xpath(key: Any) -> Optional[str]:
     element_ids = {
         "ﾍﾟｰｼﾞ_op_results": "//*[@id='H_pager']/b",
         "ﾍﾟｰｼﾞ_Next_btn_op_results": "//*[@id='H_pager']/a",
@@ -176,7 +155,7 @@ def get_xpath(key: ElementXpathTypes) -> Optional[str]:
 
 
 
-def create_excel(excel_data_list: list, header_list: list[str], file_name: str) -> None:
+def create_excel(excel_data_list: list, header_list: list[str], file_path: str) -> None:
     wb = Workbook()
     ws = wb.active
     # header作成
@@ -197,8 +176,8 @@ def create_excel(excel_data_list: list, header_list: list[str], file_name: str) 
     fill1 = styles.PatternFill(patternType='solid',fgColor='C0C0C0', bgColor='C0C0C0')
 
     # header色変更
-    rows = ws["A1":"X1"]
-    for row in rows[0]:
-        row.fill = fill1
+    for i in range(len(header_list)):
+        cell = ws.cell(1, i+1)
+        cell.fill = fill1
     
-    wb.save(f"{get_download_path()}\{file_name}.xlsx")
+    wb.save(file_path)

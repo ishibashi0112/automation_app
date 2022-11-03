@@ -12,7 +12,7 @@ import collections
 from server.type import ExcelDataFlags, ExcelDataObi, ObiOrderExistsResultsType, ObiOrderExistsType, RuleItemsType
 from server.type import ExcelDataKoutei, ExcelDataOp, ObiOrderSituationResultsType, ObiOrderSituationType
 from server.function import str_to_datetime, get_download_path, today_str
-from server.utils import get_id
+from server.utils import create_excel, get_id
 
 
 @dataclass
@@ -208,42 +208,11 @@ class OpMainProcess(Op):
             "単価","製番","納期","修理日","LT","区分","工程数","取引先code",
             "取引先名","備考"
         ]
-        wb = Workbook()
-        ws = wb.active
-        # header作成
-        for i, title in enumerate(header_list):
-            ws.cell(1,i+1).value = title
-        
-        # データ入力
-        for y, data in enumerate(self.excel_list):
-            for x, title in enumerate(header_list):
-                ws.cell(y+2, x+1).value = data.get(title)
-                    
-        # ﾌｨﾙﾀｰ設定
-        ws.auto_filter.ref = f"A1:X{ws.max_row}"
-        # header固定
-        ws.freeze_panes = 'A2'
 
-        # 色情報取得
-        fill1 = styles.PatternFill(patternType='solid',fgColor='C0C0C0', bgColor='C0C0C0')
-        fill2 = styles.PatternFill(patternType='solid',fgColor='FFFF00', bgColor='FFFF00')
-
-        #header色変更
-        for i in range(24):
-            cell = ws.cell(1, i+1)
-            cell.fill = fill1
+        file_path = f"Y:\\530_資材事業課\\パーツセンター\\※GPC_購買部\\発注G\\automation\\result_data\\{self.op_type}発注{today_str(True)}.xlsx"
+        create_excel(self.excel_list, header_list, file_path)
         
-        # 手配品番に被りが有る分に色付け
-        Item_num_list = [ws.cell(i+2,6).value for i in range(ws.max_row-1)]
-        duplicate_item_list = [key for key,value in collections.Counter(Item_num_list).items() if value > 1]
-        for i in range(ws.max_row-1):
-            current_cell = ws.cell(i+2,6)
-            if current_cell.value in duplicate_item_list:
-                current_cell.fill = fill2
         
-        # wb.save(f"{get_download_path()}\{today_str(True)}.xlsx")
-        wb.save(f"Y:\\530_資材事業課\\パーツセンター\\※GPC_購買部\\発注G\\automation\\result_data\\{self.op_type}発注{today_str(True)}.xlsx")
-    
     def get_unique_rule(self, i: int) -> Optional[RuleItemsType]:
         if len(self.settings_items) > 0:
             for rule in self.settings_items:

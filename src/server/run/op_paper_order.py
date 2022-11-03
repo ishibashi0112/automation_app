@@ -41,8 +41,8 @@ class OpPaper(Op):
     
     def output_result_file(self):
         header_list = ["取引先code","品番","受注NO","行NO","納期", "備考"]
-        file_name = f"紙{today_str(add_time=True)}"
-        create_excel(self.excel_list, header_list, file_name)
+        file_path = f"Y:\\530_資材事業課\\パーツセンター\\※GPC_購買部\\発注G\\automation\\result_data\\{self.op_type}紙{today_str(True)}.xlsx"
+        create_excel(self.excel_list, header_list, file_path)
     
     def KOUTEI_process(self, i: int) -> ExcelDataKoutei:
         koutei = OpKoutei(self.brower, self.wait, i, self.type)

@@ -39,9 +39,9 @@ class ItemJudge(ServiceSystemOperation):
 
     def new_excel(self) -> None:
         header_list = ["受注NO", "行NO", "品番", "品名", "仕様", "受注者", "ｺﾒﾝﾄ"]
-        file_name = f"品番判断{today_str(add_time=True)}"
+        file_path = f"Y:\\530_資材事業課\\パーツセンター\\※GPC_購買部\\発注G\\automation\\result_data\\品番判断{today_str(True)}.xlsx"
 
-        create_excel(self.excel_list ,header_list, file_name)
+        create_excel(self.excel_list ,header_list, file_path)
     
 
     def get_data_for_excel(self, i: int) -> IJEExcelData:
@@ -52,7 +52,7 @@ class ItemJudge(ServiceSystemOperation):
             "品名": super().get_value(get_id("品名_ij_results", i)),
             "仕様": super().get_value(get_id("仕様_ij_results", i)),
             "受注者": super().get_value(get_id("受注者_ij_results", i)),
-            "ｺﾒﾝﾄ": super().get_value(get_id("ｺﾒﾝﾄ_ij_results", i)),
+            "ｺﾒﾝﾄ": super().get_value(get_id("ｺﾒﾝﾄ_ij_results", i))
         }
 
     def append_excel_data(self, i: int) -> None:
