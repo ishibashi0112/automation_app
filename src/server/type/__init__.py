@@ -52,6 +52,10 @@ class ExcelDataKoutei(TypedDict, total=False):
     納期: str
     単価: str
 
+class ExcelDataFlags(TypedDict, total=False):
+    要確認1: Literal["○", ""]
+    要確認2: Literal["○", ""]
+
 class WeeksDataType(TypedDict):
     KOUTEI_2: dict[int, list[int]]
     KOUTEI_3: dict[int, list[int]]

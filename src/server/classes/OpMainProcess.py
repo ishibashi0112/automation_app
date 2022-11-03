@@ -9,7 +9,7 @@ from dataclasses import dataclass, field
 from openpyxl import Workbook
 from openpyxl import styles
 import collections
-from server.type import ExcelDataObi, ObiOrderExistsResultsType, ObiOrderExistsType, RuleItemsType
+from server.type import ExcelDataFlags, ExcelDataObi, ObiOrderExistsResultsType, ObiOrderExistsType, RuleItemsType
 from server.type import ExcelDataKoutei, ExcelDataOp, ObiOrderSituationResultsType, ObiOrderSituationType
 from server.function import str_to_datetime, get_download_path, today_str
 from server.utils import get_id
@@ -49,7 +49,7 @@ class OpMainProcess(Op):
             self.add_to_excel_list()
         
 
-    def update_excel_lib(self, excel_data: ExcelDataOp | ExcelDataObi | ExcelDataKoutei) -> None:
+    def update_excel_lib(self, excel_data: ExcelDataOp | ExcelDataObi | ExcelDataKoutei | ExcelDataFlags) -> None:
         self.excel_lib.update(excel_data)
     
     def add_to_excel_list(self) -> None:
@@ -74,6 +74,16 @@ class OpMainProcess(Op):
             return True
        
         return False
+    
+    def get_flags_data(self) -> ExcelDataFlags:
+        return {
+            "要確認1": "" if self.excel_lib["数量"] == self.excel_lib["受注数"] else "○",
+            "要確認2": "" if all((
+                    (self.excel_lib["数量"] % self.excel_lib["LOT"]) == 0,
+                    self.excel_lib["未引当数"] == self.excel_lib["受注数"],
+                    not self.excel_lib["数量"] == self.excel_lib["受注数"]
+                )) else "○"
+        }
     
 
     def process(self, i: int, process_type: Literal["通常", "引当"]="通常") -> None:
@@ -177,6 +187,7 @@ class OpMainProcess(Op):
         
         excel_data = super().get_data_for_excel(i, "内示")
         self.update_excel_lib(excel_data)
+        self.update_excel_lib(self.get_flags_data())
         self.add_to_excel_list()
 
 
@@ -193,8 +204,8 @@ class OpMainProcess(Op):
     def new_excel(self) -> None:
         header_list: Final[list[str]] = [
             "対応","客先名","受注NO","行NO","page","品番","品名",
-            "仕様","数量","LOT","未引当数","発注数","受注数","実利2","単価",
-            "製番","納期","修理日","LT","区分","工程数","取引先code",
+            "仕様","数量","LOT","未引当数","発注数","受注数","実利2","要確認1","要確認2",
+            "単価","製番","納期","修理日","LT","区分","工程数","取引先code",
             "取引先名","備考"
         ]
         wb = Workbook()
