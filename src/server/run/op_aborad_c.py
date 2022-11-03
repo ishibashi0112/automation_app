@@ -35,9 +35,7 @@ def op_aborad_c(id: str, password: str) -> MainProcessingResultsType:
 
                 if op.get_value(get_id("製番_op_results", i))[:2] == "93":
                     qty = int(op.get_value(get_id("数量_op_results", i)).replace(',', ''))
-                    print(qty)
                     qty_checked = op.check_qty_and_lot(i, qty)
-                    print(qty_checked)
                     op.set_qty(i, qty_checked)
                     
                 op.confirmed_as_it_is(i, is_excel=False)
