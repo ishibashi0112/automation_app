@@ -1,5 +1,4 @@
 import os
-from dotenv import load_dotenv
 from server.classes.Op import Op
 from server.classes.OpKoutei import OpKoutei
 from server.classes.OpPayments import OpPayments
@@ -15,7 +14,6 @@ from server.type import ExcelDataKoutei, ExcelDataOp, ObiOrderSituationResultsTy
 from server.function import str_to_datetime, get_download_path, today_str
 from server.utils import get_id
 
-# load_dotenv("../../.env")
 
 @dataclass
 class OpMainProcess(Op):
@@ -220,7 +218,6 @@ class OpMainProcess(Op):
         fill2 = styles.PatternFill(patternType='solid',fgColor='FFFF00', bgColor='FFFF00')
 
         #header色変更
-        # rows = ws.cell(1, 24)
         for i in range(24):
             cell = ws.cell(1, i+1)
             cell.fill = fill1
@@ -233,7 +230,8 @@ class OpMainProcess(Op):
             if current_cell.value in duplicate_item_list:
                 current_cell.fill = fill2
         
-        wb.save(f"{get_download_path()}\{today_str(True)}.xlsx")
+        # wb.save(f"{get_download_path()}\{today_str(True)}.xlsx")
+        wb.save(f"Y:\\530_資材事業課\\パーツセンター\\※GPC_購買部\\発注G\\automation\\result_data\\{self.op_type}発注{today_str(True)}.xlsx")
     
     def get_unique_rule(self, i: int) -> Optional[RuleItemsType]:
         if len(self.settings_items) > 0:
