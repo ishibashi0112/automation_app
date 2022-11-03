@@ -6,12 +6,9 @@ from server.classes.Obi import Obi
 from server.classes.Rd import Rd
 from typing import Final, Literal, Optional, TypeGuard, Any
 from dataclasses import dataclass, field
-from openpyxl import Workbook
-from openpyxl import styles
-import collections
 from server.type import ExcelDataFlags, ExcelDataObi, ObiOrderExistsResultsType, ObiOrderExistsType, RuleItemsType
 from server.type import ExcelDataKoutei, ExcelDataOp, ObiOrderSituationResultsType, ObiOrderSituationType
-from server.function import str_to_datetime, get_download_path, today_str
+from server.function import str_to_datetime, today_str
 from server.utils import create_excel, get_id
 
 
@@ -200,6 +197,9 @@ class OpMainProcess(Op):
             self.update_duplicate_item_lib(item_num_lib)
             self.add_to_duplicate_item_list()
     
+    def aaa(self):
+        
+    
 
     def new_excel(self) -> None:
         header_list: Final[list[str]] = [
@@ -212,7 +212,7 @@ class OpMainProcess(Op):
         file_path = f"Y:\\530_資材事業課\\パーツセンター\\※GPC_購買部\\発注G\\automation\\result_data\\{self.op_type}発注{today_str(True)}.xlsx"
         create_excel(self.excel_list, header_list, file_path)
         
-        
+
     def get_unique_rule(self, i: int) -> Optional[RuleItemsType]:
         if len(self.settings_items) > 0:
             for rule in self.settings_items:
