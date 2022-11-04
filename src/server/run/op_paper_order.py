@@ -28,7 +28,7 @@ class OpPaper(Op):
     id: str 
     password: str
     startPage: int
-    type: Literal["国内", "海外"] = "国内"
+    op_type: Literal["国内", "海外"] = "国内"
     excel_list: list[ExcelDataOpPaper] = field(default_factory=list)
 
     def __post_init__(self):
@@ -45,7 +45,7 @@ class OpPaper(Op):
         create_excel(self.excel_list, header_list, file_path)
     
     def KOUTEI_process(self, i: int) -> ExcelDataKoutei:
-        koutei = OpKoutei(self.brower, self.wait, i, self.type)
+        koutei = OpKoutei(self.brower, self.wait, i, self.op_type)
         koutei.start()
         KOUTEI_excel_data = koutei.get_data_for_excel()    
         if KOUTEI_excel_data["取引先code"] == "10692":
@@ -57,14 +57,14 @@ class OpPaper(Op):
         return KOUTEI_excel_data
 
 
-def op_paper_order(id: str, password: str, startPage: int, type: Literal["国内", "海外"]) -> MainProcessingResultsType:
+def op_paper_order(id: str, password: str, startPage: int, op_type: Literal["国内", "海外"]) -> MainProcessingResultsType:
 
-    op = OpPaper(id, password, startPage, type)
+    op = OpPaper(id, password, startPage, op_type)
     try:
         op.menu_open("op_entry", 1)
         op.menu_open("obi_entry", 2)
         op.screen_switching(1)
-        op.header_input(op.type)
+        op.header_input(op.op_type)
         op.move_start_page(startPage)
 
         is_not_last_page = True
