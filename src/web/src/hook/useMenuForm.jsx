@@ -2,37 +2,9 @@ import { Alert, Loader, LoadingOverlay, ScrollArea, Text } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import React, { useCallback, useState } from "react";
 import { RiCheckboxCircleLine, RiCloseCircleLine } from "react-icons/ri";
-import { base64Encode } from "../utils/base64";
 import { useItems } from "./useItems";
 import { useSchedules } from "./useSchedules";
 import { useSuppliers } from "./useSuppliers";
-import dayjs from "dayjs";
-
-const FilesToBase64Encode = async (values) => {
-  const results = await Promise.all(
-    Object.entries(values).map(async (value) => {
-      if (value[1] instanceof File) {
-        const encodedFile = await base64Encode(value[1]);
-
-        return { [value[0]]: encodedFile };
-      }
-      return { [value[0]]: value[1] };
-    })
-  );
-  return results;
-};
-
-const dateToString = (values) => {
-  const results = Object.entries(values).reduce((prev, current) => {
-    if (current[1] instanceof Date) {
-      const dateString = dayjs(current[1]).format("YY年M月D日");
-      return { ...prev, [current[0]]: dateString };
-    }
-    return { ...prev, [current[0]]: current[1] };
-  }, {});
-
-  return results;
-};
 
 export const useMenuForm = (menu) => {
   const { data: items } = useItems();
@@ -50,17 +22,10 @@ export const useMenuForm = (menu) => {
   const handleOnSubmit = useCallback(
     async (values) => {
       setIsLoading(true);
-
-      const convertedDate = dateToString(values);
-      const convertedFiles = await FilesToBase64Encode(convertedDate);
-
-      const params = convertedFiles.reduce((prev, current) => {
-        return { ...prev, ...current };
-      }, {});
-
+      const loadedValues = await values;
       const settings = { items, schedules, suppliers };
 
-      const runResult = await menu.runFunc(menu.title, settings, params);
+      const runResult = await menu.runFunc(menu.title, settings, loadedValues);
       setResult(runResult);
       setIsLoading(false);
     },

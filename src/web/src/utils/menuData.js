@@ -10,13 +10,11 @@ import { OpPayments } from "../component/Menu/MenuComponets/OpPayments";
 import { InsertText } from "../component/Menu/MenuComponets/InsertText";
 import { CreateMailForPaperOrder } from "../component/Menu/MenuComponets/CreateMailForPaperOrder";
 import { ItemJudgeEntry } from "../component/Menu/MenuComponets/ItemJudgeEntry";
+import dayjs from "dayjs";
+import { base64Encode } from "./base64";
 
 const runFunc = async (menuName, settings, params) => {
-  const result = await window.eel.run_automation(
-    menuName,
-    settings,
-    params
-  )();
+  const result = await window.eel.run_automation(menuName, settings, params)();
   return result;
 };
 
@@ -163,6 +161,11 @@ export const menus = [
           file: "",
           description: "",
         },
+
+        transformValues: (values) => ({
+          ...values,
+          deliveryTime: dayjs(values.deliveryTime).format("YY年M月D日"),
+        }),
       },
     },
     runFunc,
@@ -177,6 +180,10 @@ export const menus = [
           pdfFiles: "",
           excelFile: "",
         },
+        transformValues: async (values) => ({
+          pdfFiles: await base64Encode(values.pdfFiles),
+          excelFile: await base64Encode(values.excelFile),
+        }),
       },
     },
     runFunc,
@@ -191,6 +198,10 @@ export const menus = [
           pdfFiles: "",
           excelFile: "",
         },
+        transformValues: async (values) => ({
+          pdfFiles: await base64Encode(values.pdfFiles),
+          excelFile: await base64Encode(values.excelFile),
+        }),
       },
     },
     runFunc,
