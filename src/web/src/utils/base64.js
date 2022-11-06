@@ -3,7 +3,6 @@ export const base64Encode = async (file) => {
   reader.readAsDataURL(file);
   await new Promise((resolve) => (reader.onload = () => resolve()));
   const dataURI = reader.result;
-  console.log(dataURI);
   const base64EncodedFile = dataURI.replace(/data:.*\/.*;base64,/, "");
   return base64EncodedFile;
 };
