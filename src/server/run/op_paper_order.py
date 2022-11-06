@@ -57,9 +57,9 @@ class OpPaper(Op):
         return KOUTEI_excel_data
 
 
-def op_paper_order(id: str, password: str, startPage: int, op_type: Literal["国内", "海外"]) -> MainProcessingResultsType:
+def op_paper_order(id: str, password: str, startPage: int, type: Literal["国内", "海外"]) -> MainProcessingResultsType:
 
-    op = OpPaper(id, password, startPage, op_type)
+    op = OpPaper(id, password, startPage, type)
     try:
         op.menu_open("op_entry", 1)
         op.menu_open("obi_entry", 2)
