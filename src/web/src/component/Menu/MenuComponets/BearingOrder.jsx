@@ -72,9 +72,9 @@ export const BearingOrder = () => {
         : typeNumLength === 4
         ? machineTypeNum.slice(0, 2)
         : null;
-
     setUnitNumbers(getUnitInfoArray(colors));
   }, []);
+  // console.log(unitNumbers);
 
   return (
     <form onSubmit={form.onSubmit(handleOnSubmit)}>
@@ -118,8 +118,8 @@ export const BearingOrder = () => {
               className="flex-1"
               label="機種"
               required
-              onBlur={handleOnBlur}
               {...form.getInputProps("machineInfo.name")}
+              onBlur={handleOnBlur}
             />
             <TextInput
               className="flex-1"
