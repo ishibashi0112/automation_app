@@ -1,5 +1,5 @@
 import React from "react";
-import { ActionIcon, Card, Title } from "@mantine/core";
+import { Card, Flex, Text, Title, UnstyledButton } from "@mantine/core";
 import { RiArrowLeftSLine } from "react-icons/ri";
 import { useSharedState } from "../../hook/useSharedState";
 
@@ -8,10 +8,13 @@ export const Menu = () => {
 
   return (
     <>
-      <div className="mb-2 flex items-center">
-        <ActionIcon className="mr-2" size="md" onClick={() => setMenu("")}>
-          <RiArrowLeftSLine size={25} />
-        </ActionIcon>
+      <div className="mb-2 ">
+        <UnstyledButton className="mb-4" onClick={() => setMenu("")}>
+          <Flex align="center">
+            <RiArrowLeftSLine size={18} />
+            <Text fz="sm">戻る</Text>
+          </Flex>
+        </UnstyledButton>
         <Title order={4}>{menu.title}</Title>
       </div>
 
