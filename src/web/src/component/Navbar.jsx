@@ -75,6 +75,7 @@ export const Navbar = ({ drawerOpened, drawerToggle, setMainMenu }) => {
         <MantineNavbar.Section>
           <NavLink
             onClick={() => setFolded((o) => !o)}
+            label={!isFolded ? "折り畳む" : ""}
             icon={
               !isFolded ? (
                 <RiArrowLeftSLine size={20} />
