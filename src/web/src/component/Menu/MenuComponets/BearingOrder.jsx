@@ -18,7 +18,7 @@ import { DatePicker } from "@mantine/dates";
 import { LoginInput } from "./LoginInput";
 import { FullScreenDropZoneInput } from "./FullScreenDropZoneInput";
 import { useMenuForm } from "../../../hook/useMenuForm";
-import { useSharedState } from "../../../hook/useSharedState";
+import dayjs from "dayjs";
 
 const getUnitInfoArray = (colors) => {
   let UnitInfo = ["L", "R"];
@@ -35,7 +35,7 @@ const getUnitInfoArray = (colors) => {
   return UnitInfo;
 };
 
-const data = [
+const bearingItemsInfo = [
   { value: "464312202Z", description: "L40/44 : ｺﾞﾑ胴" },
   { value: "4443005004", description: "L40/44 : 版胴 ｺｰﾀｰｺﾞﾑ胴" },
   { value: "7643100903", description: "LS40 : ｺﾞﾑ胴" },
@@ -43,6 +43,17 @@ const data = [
   { value: "4443212004", description: "L40/44 GL40 GLX: 圧胴,渡胴" },
   { value: "EFS3110101", description: "GL40/44 GLX40/44 : ｺｰﾀｰｺﾞﾑ胴" },
   { value: "7423200700", description: "LS40P GLX40 : 圧胴,渡胴" },
+];
+
+const bearingItemNames = [
+  "ｺﾞﾑ胴",
+  "版胴",
+  "圧胴",
+  "渡胴",
+  "ｺｰﾀｰｺﾞﾑ",
+  "A渡胴",
+  "DU胴",
+  "NO胴",
 ];
 
 const AutoCompleteItem = forwardRef(
@@ -58,9 +69,25 @@ const AutoCompleteItem = forwardRef(
 
 export const BearingOrder = () => {
   const [unitNumbers, setUnitNumbers] = useState([]);
-  const [menu] = useSharedState("menu");
-  const { form, handleOnSubmit, isLoading, OverLay, resultView } =
-    useMenuForm(menu);
+  const { form, handleOnSubmit, OverLay, resultView } = useMenuForm({
+    initialValues: {
+      id: "",
+      password: "",
+      orderNum: "",
+      linesNum: "",
+      customerName: "",
+      machineInfo: { name: "", number: "" },
+      items: [{ itemNum: "", type: "", locatios: [] }],
+      deliveryTime: "",
+      file: "",
+      description: "",
+    },
+
+    transformValues: (values) => ({
+      ...values,
+      deliveryTime: dayjs(values.deliveryTime).format("YY年M月D日"),
+    }),
+  });
 
   const handleOnBlur = useCallback((e) => {
     const machineName = e.currentTarget.value;
@@ -74,7 +101,6 @@ export const BearingOrder = () => {
         : null;
     setUnitNumbers(getUnitInfoArray(colors));
   }, []);
-  // console.log(unitNumbers);
 
   return (
     <form onSubmit={form.onSubmit(handleOnSubmit)}>
@@ -142,7 +168,7 @@ export const BearingOrder = () => {
                 <tr key={i}>
                   <td>
                     <Autocomplete
-                      data={data}
+                      data={bearingItemsInfo}
                       itemComponent={AutoCompleteItem}
                       limit={10}
                       maxDropdownHeight={300}
@@ -152,16 +178,7 @@ export const BearingOrder = () => {
                   <td className="max-w-[100px]">
                     <Select
                       placeholder="Pick one"
-                      data={[
-                        "ｺﾞﾑ胴",
-                        "版胴",
-                        "圧胴",
-                        "渡胴",
-                        "ｺｰﾀｰｺﾞﾑ",
-                        "A渡胴",
-                        "DU胴",
-                        "NO胴",
-                      ]}
+                      data={bearingItemNames}
                       {...form.getInputProps(`items.${i}.type`)}
                     />
                   </td>
@@ -236,6 +253,7 @@ export const BearingOrder = () => {
           実行する
         </Button>
       </div>
+
       {OverLay}
 
       {resultView}

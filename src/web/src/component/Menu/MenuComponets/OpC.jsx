@@ -1,29 +1,29 @@
-import React, { useCallback } from "react";
-import { Button, NumberInput, TextInput } from "@mantine/core";
-
+import React from "react";
+import { Button } from "@mantine/core";
 import { LoginInput } from "./LoginInput";
-import { useForm } from "@mantine/form";
-import { useSharedState } from "../../../hook/useSharedState";
 import { useMenuForm } from "../../../hook/useMenuForm";
 
 export const OpC = () => {
-  const [menu] = useSharedState("menu");
-  const { form, handleOnSubmit, isLoading, OverLay, resultView } =
-    useMenuForm(menu);
+  const { form, handleOnSubmit, OverLay, resultView } = useMenuForm({
+    initialValues: {
+      id: "",
+      password: "",
+    },
+  });
 
   return (
-    <div className="flex flex-col gap-2">
-      <form onSubmit={form.onSubmit(handleOnSubmit)}>
+    <form onSubmit={form.onSubmit(handleOnSubmit)}>
+      <div className="flex flex-col gap-2">
         <LoginInput form={form} />
 
         <Button className="mt-4" type="submit" variant="filled">
           実行する
         </Button>
-      </form>
 
-      {OverLay}
+        {OverLay}
 
-      {resultView}
-    </div>
+        {resultView}
+      </div>
+    </form>
   );
 };

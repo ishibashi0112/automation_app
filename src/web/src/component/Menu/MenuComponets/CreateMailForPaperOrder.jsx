@@ -1,14 +1,14 @@
 import React from "react";
-
 import { FullScreenDropZoneInput } from "./FullScreenDropZoneInput";
 import { useMenuForm } from "../../../hook/useMenuForm";
 import { Button } from "@mantine/core";
-import { useSharedState } from "../../../hook/useSharedState";
 
 export const CreateMailForPaperOrder = () => {
-  const [menu] = useSharedState("menu");
-  const { form, handleOnSubmit, isLoading, OverLay, resultView } =
-    useMenuForm(menu);
+  const { form, handleOnSubmit, OverLay, resultView } = useMenuForm({
+    initialValues: {
+      pdfFiles: "",
+    },
+  });
 
   return (
     <form onSubmit={form.onSubmit(handleOnSubmit)}>

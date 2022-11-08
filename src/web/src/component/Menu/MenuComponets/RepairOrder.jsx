@@ -16,7 +16,6 @@ import { useCallback } from "react";
 import { base64Encode } from "../../../utils/base64";
 import { Rnd } from "react-rnd";
 import { Carousel } from "@mantine/carousel";
-import { useSharedState } from "../../../hook/useSharedState";
 import { useMenuForm } from "../../../hook/useMenuForm";
 
 export const RepairOrder = () => {
@@ -24,9 +23,13 @@ export const RepairOrder = () => {
   const [files, setFiles] = useState([]);
   const [previews, setPreviews] = useState([]);
   const [isOcrLoading, setIsOcrLoading] = useState(false);
-  const [menu] = useSharedState("menu");
-  const { form, handleOnSubmit, isLoading, OverLay, resultView } =
-    useMenuForm(menu);
+  const { form, handleOnSubmit, OverLay, resultView } = useMenuForm({
+    initialValues: {
+      id: "",
+      password: "",
+      orders: [{ orderNum: "", linesNum: "", itemNum: "" }],
+    },
+  });
 
   const handleClickOCR = useCallback(
     async (e) => {

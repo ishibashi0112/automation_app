@@ -2,12 +2,17 @@ import React from "react";
 import { Select, NumberInput, TextInput, Button } from "@mantine/core";
 import { LoginInput } from "./LoginInput";
 import { useMenuForm } from "../../../hook/useMenuForm";
-import { useSharedState } from "../../../hook/useSharedState";
 
 export const OpPayments = () => {
-  const [menu] = useSharedState("menu");
-  const { form, handleOnSubmit, isLoading, OverLay, resultView } =
-    useMenuForm(menu);
+  const { form, handleOnSubmit, OverLay, resultView } = useMenuForm({
+    initialValues: {
+      id: "",
+      password: "",
+      type: "",
+      startPage: 0,
+      nameInitial: "",
+    },
+  });
 
   return (
     <form onSubmit={form.onSubmit(handleOnSubmit)}>

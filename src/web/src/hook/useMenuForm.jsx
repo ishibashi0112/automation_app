@@ -4,12 +4,14 @@ import React, { useCallback, useState } from "react";
 import { RiCheckboxCircleLine, RiCloseCircleLine } from "react-icons/ri";
 import { useItems } from "./useItems";
 import { useSchedules } from "./useSchedules";
+import { useSharedState } from "./useSharedState";
 import { useSuppliers } from "./useSuppliers";
 
-export const useMenuForm = (menu) => {
+export const useMenuForm = (formData) => {
   const { data: items } = useItems();
   const { data: schedules } = useSchedules();
   const { data: suppliers } = useSuppliers();
+  const [menu] = useSharedState("menu");
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState({
     state: "",
@@ -17,7 +19,7 @@ export const useMenuForm = (menu) => {
     type: "",
   });
 
-  const form = useForm(menu.form.data);
+  const form = useForm(formData);
 
   const handleOnSubmit = useCallback(
     async (values) => {

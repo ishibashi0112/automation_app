@@ -1,14 +1,21 @@
 import React from "react";
 import { Button, FileInput } from "@mantine/core";
-import { LoginInput } from "./LoginInput";
-import { FullScreenDropZoneInput } from "./FullScreenDropZoneInput";
 import { useMenuForm } from "../../../hook/useMenuForm";
 import { useSharedState } from "../../../hook/useSharedState";
+import { base64Encode } from "../../../utils/base64";
 
 export const InsertText = ({ type }) => {
   const [menu] = useSharedState("menu");
-  const { form, handleOnSubmit, isLoading, OverLay, resultView } =
-    useMenuForm(menu);
+  const { form, handleOnSubmit, OverLay, resultView } = useMenuForm({
+    initialValues: {
+      pdfFiles: "",
+      excelFile: "",
+    },
+    transformValues: async (values) => ({
+      pdfFiles: await base64Encode(values.pdfFiles),
+      excelFile: await base64Encode(values.excelFile),
+    }),
+  });
 
   return (
     <form onSubmit={form.onSubmit(handleOnSubmit)}>
