@@ -9,9 +9,11 @@ from openpyxl import load_workbook
 from server.classes.Obi import Obi
 from server.classes.Op import Op
 from server.classes.OpKoutei import OpKoutei
+from server.classes.OpPayments import OpPayments
 from server.function import datetime_to_str, error_action, get_various_weeks, list_to_merge_str, success_action, today_str
 from server.type import ExcelDataObi, KouteiDataType, MainProcessingResultsType, RepairOrderItemsType
 from server.utils import get_id
+
 
 
 class RepairOrderExcelListType(TypedDict):
@@ -128,6 +130,10 @@ class RepairOrder(Op):
         koutei.end()
 
         return KOUTEI_data
+    
+    def payments_process(self, i):
+        payments = OpPayments(self.brower, self.wait, i)
+        payments.click_only()
 
 
 def repair_order(id: str, password: str, orders: list[RepairOrderItemsType]) -> MainProcessingResultsType:
@@ -195,9 +201,11 @@ def repair_order(id: str, password: str, orders: list[RepairOrderItemsType]) -> 
                 ro.btn_click(get_id("内示_op_results", i))
 
 
+                ro.payments_process(i)
+                
                 KOUTEI_data = ro.KOUTEI_process(i)
                 KOUTEI_num = len(KOUTEI_data)
-                
+    
                
                 if KOUTEI_num > 1:
                     KOUTEI_str_list = [f"工程({i+1}):{data['取引先名']}様" for i, data in enumerate(KOUTEI_data)]
