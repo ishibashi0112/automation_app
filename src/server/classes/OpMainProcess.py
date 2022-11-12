@@ -8,7 +8,7 @@ from server.classes.Obi import Obi
 from server.classes.Rd import Rd
 from typing import Final, Literal, Optional, TypeGuard, Any
 from dataclasses import dataclass, field
-from server.type import ExcelDataFlags, ExcelDataObi, ObiOrderExistsResultsType, ObiOrderExistsType, RuleItemsType
+from server.type import ExcelDataFlags, ExcelDataObi, ObiOrderExistsResultsType, ObiOrderExistsType, RuleOp, RuleItems, RuleSuppliers
 from server.type import ExcelDataKoutei, ExcelDataOp, ObiOrderSituationResultsType, ObiOrderSituationType
 from server.function import str_to_datetime, today_str
 from server.utils import create_excel, get_id
@@ -20,7 +20,7 @@ class OpMainProcess(Op):
     password: str
     startPage: int = 0
     nameInitial: str = ""
-    settings_items: list[RuleItemsType] = field(default_factory=list)
+    settings_op: RuleOp = field(default_factory=list)
     op_type: Literal["国内", "海外"] = "国内"
 
     excel_list: Any = field(default_factory=list)
@@ -33,47 +33,59 @@ class OpMainProcess(Op):
         super().open_main_page(os.environ["SERVICE_SYSTEM_URL"])
         super().Login(self.id, self.password)
 
+
     def confirmed_as_it_is(self, i: int, notes_text: str="", is_excel: bool=True) -> None:  
         super().btn_click(get_id("更新_op_results", i))
-        super().set_value(get_id("備考_op_results", i), notes_text)
-        super().btn_click(get_id("確定check_op_results", i))
-        koutei = OpKoutei(self.brower, self.wait, i)
-        koutei.click_only()
+        koutei = OpKoutei(self.brower, self.wait, i, settings_suppliers=self.settings_op["suppliers"])
+        supplier_rule = koutei.click_only()
         payments = OpPayments(self.brower, self.wait, i)
         payments.click_only()
         
-        if is_excel:
-            excel_data = super().get_data_for_excel(i, "確定")
-            self.update_excel_lib(excel_data)
-            self.add_to_excel_list()
+        if supplier_rule and "設定ルールより" not in notes_text:
+            self.supplier_rule_process(supplier_rule, i)
+        
+        else:
+            super().set_value(get_id("備考_op_results", i), notes_text)
+            super().btn_click(get_id("確定check_op_results", i))
+        
+            if is_excel:
+                excel_data = super().get_data_for_excel(i, "確定")
+                self.update_excel_lib(excel_data)
+                self.add_to_excel_list()
         
 
     def update_excel_lib(self, excel_data: ExcelDataOp | ExcelDataObi | ExcelDataKoutei | ExcelDataFlags) -> None:
         self.excel_lib.update(excel_data)
     
+
     def add_to_excel_list(self) -> None:
         self.excel_list.append(self.excel_lib)
         self.excel_lib = {}
     
+
     def update_duplicate_item_lib(self, item_data) -> None:
         self.duplicate_item_lib.update(item_data)
     
+
     def add_to_duplicate_item_list(self) -> None:
         self.duplicate_item_list.append(self.duplicate_item_lib)
         self.duplicate_item_lib = {}
     
+
     def delete_and_add_excel_data(self, i: int, notes_text: str="") -> None:
         super().delete(i, notes_text)
         excel_data = super().get_data_for_excel(i, "削除")
         self.update_excel_lib(excel_data)
         self.add_to_excel_list()
     
+
     def is_ObiOrderSituationResultsType(self, result_obi: ObiOrderSituationType | ObiOrderExistsType) -> TypeGuard[ObiOrderSituationType]:
         if "many" in result_obi:
             return True
        
         return False
     
+
     def get_flags_data(self) -> ExcelDataFlags:
         return {
             "要確認1": "" if self.excel_lib["数量"] == self.excel_lib["受注数"] else "○",
@@ -162,17 +174,24 @@ class OpMainProcess(Op):
 
         # 更新ボタンをクリック
         super().btn_click(get_id("更新_op_results", i))
-        
-        # 工程画面へ
-        koutei = OpKoutei(self.brower, self.wait, i, self.op_type, delivery_time=delivery_time)
-        result_koutei = koutei.process()
-        KOUTEI_data = result_koutei["data"]
-        KOUTEI_excel_data = result_koutei["excel"]
-        self.update_excel_lib(KOUTEI_excel_data)
-        
+
         # 支給画面へ
         payments = OpPayments(self.brower, self.wait, i)
         is_payments = payments.click_only()
+        
+        # 工程画面へ
+        koutei = OpKoutei(self.brower, self.wait, i, self.op_type, delivery_time=delivery_time, settings_suppliers=self.settings_op["suppliers"])
+        result_koutei = koutei.process()
+        KOUTEI_data = result_koutei["data"]
+        KOUTEI_excel_data = result_koutei["excel"]
+
+        if result_koutei["supplier_rule"]:
+            self.supplier_rule_process(result_koutei["supplier_rule"], i)
+
+            return
+
+        self.update_excel_lib(KOUTEI_excel_data)
+    
         
         # コメントを決める
         comment = super().decide_comment(is_payments, KOUTEI_data, self.nameInitial)
@@ -234,10 +253,18 @@ class OpMainProcess(Op):
         create_excel(self.excel_list, header_list, file_path)
         
 
-    def get_unique_rule(self, i: int) -> Optional[RuleItemsType]:
-        if len(self.settings_items) > 0:
-            for rule in self.settings_items:
+    def get_unique_item_rule(self, i: int) -> Optional[RuleItems]:
+        if len(self.settings_op["items"]) > 0:
+            for rule in self.settings_op["items"]:
                 if rule["itemNum"] == super().get_value(get_id("品番_op_results", i)) and rule["isApply"]:
+                    return rule
+        
+        return None
+    
+    def get_unique_supplier_rule(self, i: int) -> Optional[RuleSuppliers]:
+        if len(self.settings_op["suppliers"]) > 0:
+            for rule in self.settings_op["suppliers"]:
+                if rule["code"] == super().get_value(get_id("品番_op_results", i)) and rule["isApply"]:
                     return rule
         
         return None
@@ -294,7 +321,20 @@ class OpMainProcess(Op):
             
         # 発注数よりも未引当数が少ない場合は、そのまま打ち切りをする
         else:
-            self.delete_and_add_excel_data(i, "web 十分足りてる")  
+            self.delete_and_add_excel_data(i, "web 十分足りてる") 
+
+    def supplier_rule_process(self, rule: RuleSuppliers, i: int) -> None:
+        if rule["rule"] == "処理をスルー":
+            super().set_value(get_id("備考_op_results", i), "w/c設定ルールよりスルー")
+            
+        elif rule["rule"] == "伝票を発行":
+            super().set_value(get_id("備考_op_results", i), "w/c設定ルールより伝票発行")
+            super().btn_click(get_id("確定check_op_results", i))
+
+            excel_data = super().get_data_for_excel(i, "確定")
+            self.update_excel_lib(excel_data)
+            self.add_to_excel_list()
+         
 
 
 

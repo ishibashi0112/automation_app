@@ -1,9 +1,9 @@
 from dataclasses import dataclass, field
 from server.classes.ServiceSystemOperation import ServiceSystemOperation
-from typing import Final, Literal
+from typing import Final, Literal, Optional
 from datetime import datetime
 from server.type import KouteDataResultsType, KouteiDataType, WeeksDataType
-from server.type import ExcelDataKoutei
+from server.type import ExcelDataKoutei, RuleSuppliers
 from server.utils import get_id
 from server.function import price_str_to_int, str_to_datetime, today_str, today, get_various_weeks, datetime_to_str, list_to_merge_str
 from selenium.webdriver.support.wait import WebDriverWait
@@ -16,14 +16,21 @@ class OpKoutei(ServiceSystemOperation):
     i: int
     op_type: Literal["国内", "海外"]="国内"
     delivery_time: str=""
+    settings_suppliers: list[RuleSuppliers] = field(default_factory=list) 
     num: int = 1
     koutei_data: list[KouteiDataType] = field(default_factory=list) 
+    supplier_code_list: list[str] = field(default_factory=list) 
     
-    def start(self) -> None:
+    def start(self) -> Optional[RuleSuppliers]:
         super().btn_click(get_id("工程_op_results", self.i))
         super().the_element_view_wait("H_cnfrm_btn")
         KOUTEI_exists_list = self.KOUTEI_exists()
         self.num = sum(KOUTEI_exists_list)
+        self.supplier_code_list = self.get_supplier_code_list()
+
+        supplier_rule = self.get_unique_supplier_rule()
+
+        return supplier_rule if supplier_rule else None
             
     
     def end(self) -> None:
@@ -32,13 +39,16 @@ class OpKoutei(ServiceSystemOperation):
         super().btn_click(get_id("確定_op_KOUTEI"))
         super().the_element_view_wait(get_id("備考_op_results"))
     
-    def click_only(self) -> None:
-        self.start()
+    def click_only(self) -> Optional[RuleSuppliers]:
+        supplier_rule = self.start()
         self.set_price_not_setting()
         self.end()
+
+        return supplier_rule if supplier_rule else None
+
     
     def process(self) -> KouteDataResultsType:
-        self.start()
+        supplier_rule = self.start()
         self.set_delivery_time()
         self.set_price_not_setting()
         KOUTEI_data: list[KouteiDataType] = []
@@ -47,7 +57,10 @@ class OpKoutei(ServiceSystemOperation):
         excel_data = self.get_data_for_excel() 
         self.end()
 
-        return {"data": KOUTEI_data, "excel": excel_data}
+        if supplier_rule:
+            return {"data": KOUTEI_data, "excel": excel_data, "supplier_rule": supplier_rule}
+        else:
+            return {"data": KOUTEI_data, "excel": excel_data, "supplier_rule": None}
 
     def _get_values(self, i: int) -> KouteiDataType:
         edi_checked = super().get_checked(get_id("EDI_op_KOUTEI", i))
@@ -70,6 +83,17 @@ class OpKoutei(ServiceSystemOperation):
         sup = super()
         return [len(sup.get_elements("id", get_id("工程NO_op_KOUTEI", i))) for i in range(3)]
     
+    def get_supplier_code_list(self) -> list[str]:
+        sup = super()
+        return [sup.get_value(get_id("取引先code_op_KOUTEI", i)) for i in range(self.num)]
+
+    def get_unique_supplier_rule(self) -> Optional[RuleSuppliers]: 
+        if len(self.settings_suppliers):
+            for rule in self.settings_suppliers:
+                if rule["code"] in self.supplier_code_list and rule["isApply"]:
+                    return rule
+        
+        return None
     
     def set_today_delicery_time(self) -> None:
         for i in range(self.num):
@@ -145,7 +169,6 @@ class OpKoutei(ServiceSystemOperation):
         
         if self.delivery_time:
             delivery_time_str_list = self.delivery_time.split("__")
-            print(delivery_time_str_list)
             for i in range(self.num):
                 super().set_value(get_id("納期_op_KOUTEI", i), delivery_time_str_list[i])
 

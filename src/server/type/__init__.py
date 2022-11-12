@@ -1,5 +1,4 @@
 from datetime import datetime
-import typing
 from typing import Literal, Optional, TypedDict
 from selenium.webdriver.remote.webelement import WebElement
 
@@ -8,12 +7,24 @@ class OrdersInfo(TypedDict):
      linesNum: str
      itemNum: str
 
-class RuleItemsType(TypedDict):
+class RuleItems(TypedDict):
     id: str
     isApply: bool
     itemName: str
     itemNum: str
     rule: Literal["処理をスルー", "伝票を発行", "発注計画を削除"]
+
+class RuleSuppliers(TypedDict):
+    id: str
+    isApply: bool
+    Name: str
+    code: str
+    rule: Literal["処理をスルー", "伝票を発行"]
+
+class RuleOp(TypedDict):
+    items: list[RuleItems]
+    suppliers: list[RuleSuppliers]
+
 
 class SchedulesType(TypedDict):
     id: str
@@ -21,10 +32,14 @@ class SchedulesType(TypedDict):
     end: str
     title: str
 
+class Settings(TypedDict):
+    op: RuleOp
+    schedules: list[SchedulesType]
+
+
 class RunArgsTypes(TypedDict, total=False):
     menuName: Literal["発注計画(国内) 展開", "発注計画(海外A) 展開", "発注計画(海外C) 展開", "特急製作依頼書 作成", "ｵｰﾀﾞｰｼｰﾄ 作成", "預かり修理 展開", "支給品 手配","発注計画 展開(Excel)","胴ﾍﾞｱﾘﾝｸﾞ 手配"]
-    items: list[RuleItemsType]
-    schedules: list[SchedulesType]
+    settings: Settings
     id: str
     password: str
     startPage: int
@@ -149,6 +164,7 @@ class KouteiDataType(TypedDict):
 class KouteDataResultsType(TypedDict):
     data: list[KouteiDataType]
     excel: ExcelDataKoutei
+    supplier_rule: Optional[RuleSuppliers]
 
 class OpExcelRequiredDataType(TypedDict):
     対応: Literal["内示", "確定", "削除"]

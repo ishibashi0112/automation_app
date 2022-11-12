@@ -3,13 +3,13 @@ import signal
 from server.classes.OpMainProcess import OpMainProcess
 from server.type import MainProcessingResultsType
 from server.function import error_action, success_action, today_str
-from server.type import RuleItemsType
+from server.type import RuleOp
 from server.utils import get_id
 
 
-def op_domestic(settings_items: list[RuleItemsType], id: str, password: str, startPage: int, nameInitial: str) -> MainProcessingResultsType:
+def op_domestic(settings_op: RuleOp, id: str, password: str, startPage: int, nameInitial: str) -> MainProcessingResultsType:
 
-    op = OpMainProcess(id, password, startPage, nameInitial, settings_items, "国内")
+    op = OpMainProcess(id, password, startPage, nameInitial, settings_op, "国内")
     try:
         op.menu_open("op_entry", 1)
         op.menu_open("obi_entry", 2)
@@ -34,7 +34,7 @@ def op_domestic(settings_items: list[RuleItemsType], id: str, password: str, sta
                     continue
 
                 # 設定より特有のルールがある場合
-                unique_rule = op.get_unique_rule(i)
+                unique_rule = op.get_unique_item_rule(i)
                 if unique_rule:
                     if unique_rule["rule"] == '処理をスルー':
                         continue
@@ -51,6 +51,8 @@ def op_domestic(settings_items: list[RuleItemsType], id: str, password: str, sta
                 if op.get_value(get_id("生産中止ﾌﾗｸﾞ_op_results", i)):
                     op.add_comment_and_through(i, f"{today_str()} 生産中止")
                     continue
+                
+
                 
                 #web注文の場合
                 if op.get_value(get_id("受注者ｺｰﾄﾞ_op_results", i)) == "WEBB":

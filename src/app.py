@@ -77,10 +77,10 @@ def run_automation(menu_name, settings, params) -> Any:
 
 
     if menu_name == "発注計画(国内) 展開":
-        return op_domestic(settings["items"], **params )
+        return op_domestic(settings["op"], **params )
 
     if menu_name == "発注計画(海外A) 展開":
-        return op_aborad(settings["items"], **params)
+        return op_aborad(settings["op"], **params)
 
     if menu_name == "発注計画(海外C) 展開":
         return op_aborad_c(**params)
