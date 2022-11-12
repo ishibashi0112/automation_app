@@ -70,8 +70,8 @@ export const OpSuppliers = ({ title }) => {
 
   const form = useForm({
     initialValues: {
-      itemNum: "",
-      itemName: "",
+      code: "",
+      name: "",
       rule: "",
     },
   });
@@ -95,7 +95,7 @@ export const OpSuppliers = ({ title }) => {
       await mutate("suppliers");
       showNotification({
         title: "追加処理が正常に完了しました。",
-        message: `品番:${values.itemNum}  ${values.itemName}を追加しました。`,
+        message: `品番:${values.code}  ${values.name}を追加しました。`,
         color: "teal",
         icon: <RiCheckFill />,
       });
@@ -152,7 +152,7 @@ export const OpSuppliers = ({ title }) => {
   return (
     <div>
       {title}
-      <Card className="min-h-[500px]" shadow="sm">
+      <Card className="min-h-[550px]" shadow="sm">
         <div className="p-2">
           <Popover
             opened={popOpened}
@@ -181,13 +181,13 @@ export const OpSuppliers = ({ title }) => {
                   label="コード"
                   placeholder="取引先ｺｰﾄﾞを入力してください"
                   required
-                  {...form.getInputProps("itemNum")}
+                  {...form.getInputProps("code")}
                 />
                 <TextInput
                   label="取引先名"
                   placeholder="取引先名を入力してください"
                   required
-                  {...form.getInputProps("itemName")}
+                  {...form.getInputProps("name")}
                 />
                 <Select
                   data={["処理をスルー", "伝票を発行"]}
@@ -316,6 +316,7 @@ const TableRows = ({ row, setUpdateArray }) => {
           {cell.column.columnDef.header === "反映" ? (
             <div>
               <Switch
+                className="flex items-center"
                 data-id={cell.row.original.id}
                 checked={isChecked}
                 onChange={handleOnChange}
@@ -329,7 +330,7 @@ const TableRows = ({ row, setUpdateArray }) => {
                 </Button>
               </Menu.Target>
               <Menu.Dropdown>
-                <Menu.Label>{cell.row.original.itemNum}</Menu.Label>
+                <Menu.Label>{cell.row.original.code}</Menu.Label>
                 <Menu.Item icon={<RiEdit2Line />}>編集</Menu.Item>
                 <Menu.Item
                   color="red"

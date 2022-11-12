@@ -154,7 +154,7 @@ export const OpItems = ({ title }) => {
   return (
     <div>
       {title}
-      <Card shadow="sm">
+      <Card className="min-h-[550px]" shadow="sm">
         <div className="p-2">
           <Popover
             opened={popOpened}
@@ -317,6 +317,7 @@ const TableRows = ({ row, setUpdateArray }) => {
           {cell.column.columnDef.header === "反映" ? (
             <div>
               <Switch
+                className="flex items-center"
                 data-id={cell.row.original.id}
                 checked={isChecked}
                 onChange={handleOnChange}

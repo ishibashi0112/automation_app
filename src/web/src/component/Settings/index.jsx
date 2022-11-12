@@ -1,5 +1,12 @@
 import React from "react";
-import { ActionIcon, Card, NavLink, Title } from "@mantine/core";
+import {
+  Card,
+  Flex,
+  NavLink,
+  Text,
+  Title,
+  UnstyledButton,
+} from "@mantine/core";
 import { useState } from "react";
 import { RiArrowLeftSLine } from "react-icons/ri";
 import { useCallback } from "react";
@@ -22,10 +29,6 @@ export const Settings = () => {
 
   const handleSettigSwich = useCallback((navLabel) => {
     setSelectedSettingMenu(navLabel);
-  }, []);
-
-  const handleRetrun = useCallback(() => {
-    setSelectedSettingMenu("");
   }, []);
 
   const settingNavs = navData.map((nav) => {
@@ -55,10 +58,16 @@ export const Settings = () => {
   });
 
   const settingTitle = (
-    <div className="flex items-center mb-2">
-      <ActionIcon className="mr-3" size="md" onClick={handleRetrun}>
-        <RiArrowLeftSLine size={25} />
-      </ActionIcon>
+    <div className="mb-2 ">
+      <UnstyledButton
+        className="mb-4"
+        onClick={() => setSelectedSettingMenu("")}
+      >
+        <Flex align="center">
+          <RiArrowLeftSLine size={18} />
+          <Text fz="sm">戻る</Text>
+        </Flex>
+      </UnstyledButton>
       <Title order={4}>{selectedSettingMenu}</Title>
     </div>
   );
