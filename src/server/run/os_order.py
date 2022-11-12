@@ -4,13 +4,9 @@ from time import sleep
 from typing import Any, Optional, TypedDict
 import os
 import signal
-
-from dotenv import load_dotenv
 from server.classes.Op import Op
 from server.function import error_action, get_various_weeks, success_action
 from server.type import MainProcessingResultsType 
-
-# load_dotenv("../../.env")
 
 class OsOrderItemInfo(TypedDict):
     品番: str
@@ -37,7 +33,7 @@ class OsOrder(Op):
         super().select("ReportViewerControl_ctl04_ctl27_ddValue", "未打切")
         super().btn_click("ReportViewerControl_ctl04_ctl00")
 
-        sleep(70)
+        sleep(90)
     
     def or_inquiry_is_last_page(self) -> bool:
         current_page = int(super().get_value("ReportViewerControl_ctl05_ctl00_CurrentPage"))
@@ -75,7 +71,7 @@ class OsOrder(Op):
     def or_inquiry_process(self) -> None:
         page = 1
         while True:     
-            xpath_num = "4" if page == 1 else "1"
+            xpath_num = "3" if page == 1 else "1"
             base_xpath = f"//div[@id='VisibleReportContentReportViewerControl_ctl09']/div/table/tbody/tr/td/table/tbody/tr[1]/td/table/tbody/tr/td/table/tbody/tr[{xpath_num}]/td/table/tbody"
             order_items = super().get_elements(
                     "xpath", 
@@ -107,6 +103,7 @@ class OsOrder(Op):
                         item_dict["受注NO"] = td.text
                         
                         # 受注NOが振られているかどうかで格納するリストを振り分ける
+        
                         if len(item_dict["受注NO"]) == 10:            
                             self.has_order_list = [*self.has_order_list, item_dict] 
                         else:
