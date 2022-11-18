@@ -20,17 +20,34 @@ import { FullScreenDropZoneInput } from "./FullScreenDropZoneInput";
 import { useMenuForm } from "../../../hook/useMenuForm";
 import dayjs from "dayjs";
 
-const getUnitInfoArray = (colors) => {
-  let UnitInfo = ["L", "R"];
+const getUnitInfoArray = (machineName) => {
+  const machineTypeNum = machineName.replace(/[^0-9]/g, "");
+  const ReverseTypeExists =
+    machineName.includes("SP") || machineName.includes("RP");
+  const typeNumLength = machineTypeNum.length;
+  const colors =
+    typeNumLength === 3
+      ? Number(machineTypeNum.slice(0, 1))
+      : typeNumLength === 4
+      ? Number(machineTypeNum.slice(0, 2))
+      : 0;
 
   if (!colors) {
-    return UnitInfo;
+    return ["L", "R"];
   }
 
-  for (let i = 0; i < colors; i++) {
-    const LR = [`${i + 1}L`, `${i + 1}R`];
-    UnitInfo = [...UnitInfo, ...LR];
-  }
+  const count = [...Array(colors)].map((v, k) => k);
+
+  const UnitInfo = count.reduce(
+    (prev, current, i) => {
+      const LR = ReverseTypeExists
+        ? [`上${i + 1}L`, `上${i + 1}R`, `下${i + 1}L`, `下${i + 1}R`]
+        : [`${i + 1}L`, `${i + 1}R`];
+      console.log(LR);
+      return [...prev, ...LR];
+    },
+    ["L", "R"]
+  );
 
   return UnitInfo;
 };
@@ -91,15 +108,8 @@ export const BearingOrder = () => {
 
   const handleOnBlur = useCallback((e) => {
     const machineName = e.currentTarget.value;
-    const machineTypeNum = machineName.replace(/[^0-9]/g, "");
-    const typeNumLength = machineTypeNum.length;
-    const colors =
-      typeNumLength === 3
-        ? machineTypeNum.slice(0, 1)
-        : typeNumLength === 4
-        ? machineTypeNum.slice(0, 2)
-        : null;
-    setUnitNumbers(getUnitInfoArray(colors));
+    const unitInfoArray = getUnitInfoArray(machineName);
+    setUnitNumbers(unitInfoArray);
   }, []);
 
   return (
