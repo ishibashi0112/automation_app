@@ -71,8 +71,9 @@ class OsOrder(Op):
     def or_inquiry_process(self) -> None:
         page = 1
         while True:     
-            xpath_num = "3" if page == 1 else "1"
-            base_xpath = f"//div[@id='VisibleReportContentReportViewerControl_ctl09']/div/table/tbody/tr/td/table/tbody/tr[1]/td/table/tbody/tr/td/table/tbody/tr[{xpath_num}]/td/table/tbody"
+            first_page_xpath = f"//div[@id='VisibleReportContentReportViewerControl_ctl09']/div/table/tbody/tr/td/table/tbody/tr[1]/td/table/tbody/tr/td/table/tbody/tr[3]/td/table/tbody"
+            after_two_pages_xpath = f"//div[@id='VisibleReportContentReportViewerControl_ctl09']/div/table/tbody/tr/td/table/tbody/tr[1]/td/table/tbody/tr/td/table/tbody"
+            base_xpath = first_page_xpath if page == 1 else after_two_pages_xpath
             order_items = super().get_elements(
                     "xpath", 
                     f"{base_xpath}/tr"
