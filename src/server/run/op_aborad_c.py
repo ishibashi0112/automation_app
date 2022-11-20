@@ -12,12 +12,10 @@ def op_aborad_c(id: str, password: str) -> MainProcessingResultsType:
         op.screen_switching(1)
         op.header_input("海外C")
 
+        while True:
+            items_list = op.get_item_els()
 
-        is_not_last_page = True
-        while is_not_last_page:
-            items_array = op.get_item_els()
-
-            for i, item in enumerate(items_array):
+            for i, item in enumerate(items_list):
                 #次にみるitemが無い場合
                 if len(item) == 0:
                     break
@@ -40,11 +38,11 @@ def op_aborad_c(id: str, password: str) -> MainProcessingResultsType:
                     
                 op.confirmed_as_it_is(i, is_excel=False)
 
-            is_not_last_page = op.check_next_page_exists() 
-
-            if is_not_last_page:
+            if  op.check_next_page_exists():
                 op.move_next_page()
                 op.nomal_wait()
+            else:
+                break
                 
                 
 # ========================================================================================

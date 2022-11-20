@@ -17,13 +17,12 @@ def op_aborad(settings_op: RuleOp, id: str, password: str, startPage: int, nameI
         op.header_input("海外")
         op.move_start_page(startPage)
 
-        is_not_last_page = True
-        while is_not_last_page:
-            items_array = op.get_item_els()
+        while True:
+            items_list = op.get_item_els()
 
-            for i, item in enumerate(items_array):
+            for i, item in enumerate(items_list):
                 #次にみるitemが無い場合
-                if len(item) == 0:
+                if item == []:
                     break
 
                 #備考欄に記載がある場合
@@ -64,12 +63,11 @@ def op_aborad(settings_op: RuleOp, id: str, password: str, startPage: int, nameI
                 # 最終的に残るもの。
                 op.process(i)
 
-            is_not_last_page = op.check_next_page_exists() 
-
-            if is_not_last_page:
+            if op.check_next_page_exists() :
                 op.move_next_page()
                 op.nomal_wait()
-                
+            else:
+                break
                 
 # ========================================================================================
         op.new_excel()

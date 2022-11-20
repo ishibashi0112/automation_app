@@ -36,6 +36,7 @@ class ServiceSystemOperation(WebDriverOparation):
             "rd_entry": {"open": ["mn_101", "mn_113"], "wait": "H_item_cd" },
             "os_entry": {"open": ["mn_66", "mn_74"], "wait": "H_new_entry_btn" },
             "or_inquiry": {"open": ["mn_178", "mn_343","mn_344"], "wait": "ReportViewerControl_ctl04_ctl07_txtValue" },
+            "dr_inquiry": {"open": ["mn_178", "mn_343","mn_365"], "wait": "ReportViewerControl_ctl04_ctl07_txtValue" },
             "or_change_entry": {"open": ["mn_1", "mn_66", "mn_70"], "wait": "H_srch_btn" },
             "item_judge_entry": {"open": ["mn_66", "mn_71"], "wait": "H_srch_btn"}
             }

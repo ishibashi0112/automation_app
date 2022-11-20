@@ -88,7 +88,7 @@ class OpMainProcess(Op):
 
     def get_flags_data(self) -> ExcelDataFlags:
         return {
-            "要確認1": "" if self.excel_lib["数量"] == self.excel_lib["受注数"] else "○",
+            "要確認1": "" if self.excel_lib["数量"] == self.excel_lib["受注数"] == self.excel_lib["未引当数"] else "○",
             "要確認2": "" if all((
                     (self.excel_lib["数量"] % self.excel_lib["LOT"]) == 0,
                     self.excel_lib["未引当数"] == self.excel_lib["受注数"],

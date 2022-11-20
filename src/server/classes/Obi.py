@@ -139,18 +139,17 @@ class Obi(ServiceSystemOperation):
     
     def check_all_order(self) -> ObiOrderExistsResultsType:
         if self.check_pages_exists():
-            is_not_last_page: bool = True
-            while is_not_last_page:
-                
+            while True:
                 result = self.check_order_exists()
                 result_data = result["data"]
                 if result_data["exist"]:
                     return result
 
-                is_not_last_page = self.check_next_page_exists()
-                if is_not_last_page:
+                if self.check_next_page_exists():
                     self.move_next_page()               
                     super().nomal_wait()
+                else:
+                    break
 
             return {"data": {"exist": False, "repair_days": "" }, "excel": None}
         else:
@@ -159,20 +158,18 @@ class Obi(ServiceSystemOperation):
     
     def check_all_order_situation(self, return_qty: bool = False) -> ObiOrderSituationResultsType:
         if self.check_pages_exists():
-            is_not_last_page: bool = True
             before_result = None
-            while is_not_last_page:
-                # print(f"before_result  {before_result}")
-                
+            while True:
                 current_result = self.check_order_situation(before_result)
                 before_result = current_result
                 if current_result["data"]["exist"]:
                     return current_result
 
-                is_not_last_page = self.check_next_page_exists()
-                if is_not_last_page:
+                if self.check_next_page_exists():
                     self.move_next_page()               
                     super().nomal_wait()
+                else:
+                    break
 
             return {"data": None, "excel": None} if not return_qty else before_result
         else:
