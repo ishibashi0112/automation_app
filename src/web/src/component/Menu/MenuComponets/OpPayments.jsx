@@ -9,7 +9,7 @@ export const OpPayments = () => {
       id: "",
       password: "",
       type: "",
-      startPage: 0,
+      startPage: 1,
       nameInitial: "",
     },
   });
@@ -27,10 +27,10 @@ export const OpPayments = () => {
           {...form.getInputProps("type")}
         />
         <NumberInput
-          defaultValue={0}
+          defaultValue={1}
           placeholder="page num"
           label="StartPage"
-          description="1 = 10ページ分スキップします"
+          description="開始するページ数を指定します"
           required
           {...form.getInputProps("startPage")}
         />

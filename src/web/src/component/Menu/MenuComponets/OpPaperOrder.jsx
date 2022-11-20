@@ -9,7 +9,7 @@ export const OpPaperOrder = () => {
       id: "",
       password: "",
       type: "",
-      startPage: "",
+      startPage: 1,
     },
   });
 
@@ -26,10 +26,10 @@ export const OpPaperOrder = () => {
           {...form.getInputProps("type")}
         />
         <NumberInput
-          defaultValue={0}
+          defaultValue={1}
           placeholder="page num"
           label="StartPage"
-          description="1 = 10ページ分スキップします"
+          description="開始するページ数を指定します"
           required
           {...form.getInputProps("startPage")}
         />

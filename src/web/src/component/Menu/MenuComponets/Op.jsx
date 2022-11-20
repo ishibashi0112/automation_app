@@ -8,7 +8,7 @@ export const Op = () => {
     initialValues: {
       id: "",
       password: "",
-      startPage: 0,
+      startPage: 1,
       nameInitial: "",
     },
   });
@@ -18,10 +18,10 @@ export const Op = () => {
       <div className="flex flex-col gap-2">
         <LoginInput form={form} />
         <NumberInput
-          defaultValue={0}
+          defaultValue={1}
           placeholder="page num"
           label="StartPage"
-          description="1 = 10ページ分スキップします"
+          description="開始するページ数を指定します"
           required
           {...form.getInputProps("startPage")}
         />

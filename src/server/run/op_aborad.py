@@ -17,7 +17,6 @@ def op_aborad(settings_op: RuleOp, id: str, password: str, startPage: int, nameI
         op.header_input("海外")
         op.move_start_page(startPage)
 
-
         is_not_last_page = True
         while is_not_last_page:
             items_array = op.get_item_els()

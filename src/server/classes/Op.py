@@ -10,6 +10,7 @@ from selenium.webdriver.remote.webelement import WebElement
 from datetime import datetime
 from server.type import DuplicateItemType, OpRequiredDataType
 from server.type import ExcelDataOp
+import re
 
 
 class Op(ServiceSystemOperation):
@@ -21,16 +22,33 @@ class Op(ServiceSystemOperation):
         super().btn_click(get_id("検索_op_search"))
 
         super().nomal_wait()
+
     
     def move_start_page(self, start_page: int) -> None:
-        click_times = start_page
-        if click_times:
-            for _ in range(click_times):
-                pagenation_zone = super().get_element("id", "H_pager")
-                page_array = pagenation_zone.find_elements(by=By.TAG_NAME, value="a" )
-                super().btn_click(arg_element=page_array[len(page_array)-2])
+        page_info_text = super().get_element("id", "M1PageInfo").text
+        page_text_re = re.search("(?<=\().+?(?=\))", page_info_text)
 
-                super().nomal_wait()
+        if not page_text_re:
+            return
+
+        page_text = page_text_re.group()
+        last_page_text = int(page_text.split(" ")[-1])
+
+        if start_page > last_page_text:
+            raise ValueError("指定されたﾍﾟｰｼﾞ数は存在しません")
+
+        while True:
+            page_num_el_list = super().get_elements("xpath", get_xpath("ﾍﾟｰｼﾞ_Next_btn_op_results"))
+            for page_num_el in page_num_el_list:
+                if page_num_el.text == str(start_page):
+                    super().btn_click(arg_element=page_num_el)
+                    super().nomal_wait()
+
+                    return
+
+            super().btn_click(arg_element=page_num_el_list[-2])
+            super().nomal_wait()
+
     
     def get_item_els(self) -> list[list[WebElement]]:
         sup = super()
