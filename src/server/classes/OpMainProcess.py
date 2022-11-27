@@ -34,7 +34,7 @@ class OpMainProcess(Op):
         super().Login(self.id, self.password)
 
 
-    def confirmed_as_it_is(self, i: int, notes_text: str="", is_excel: bool=True) -> None:  
+    def confirmed_as_it_is(self, i: int, notes_text: str="", is_excel: bool=True, ) -> None:  
         super().btn_click(get_id("更新_op_results", i))
         koutei = OpKoutei(self.brower, self.wait, i, settings_suppliers=self.settings_op["suppliers"])
         supplier_rule = koutei.click_only()

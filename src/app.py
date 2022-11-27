@@ -83,7 +83,7 @@ def run_automation(menu_name, settings, params) -> Any:
         return op_aborad(settings["op"], **params)
 
     if menu_name == "発注計画(海外C) 展開":
-        return op_aborad_c(**params)
+        return op_aborad_c(settings["op"], **params)
 
     if menu_name == "特急製作依頼書 作成":
         return op_paper_order(**params)

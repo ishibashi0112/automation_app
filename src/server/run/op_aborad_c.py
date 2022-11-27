@@ -4,9 +4,10 @@ from server.classes.OpMainProcess import OpMainProcess
 from server.type import MainProcessingResultsType
 from server.function import error_action, success_action, today_str
 from server.utils import get_id
+from server.type import RuleOp
 
-def op_aborad_c(id: str, password: str) -> MainProcessingResultsType:
-    op = OpMainProcess(id, password)
+def op_aborad_c(settings_op: RuleOp, id: str, password: str) -> MainProcessingResultsType:
+    op = OpMainProcess(id, password, settings_op=settings_op)
     try:
         op.menu_open("op_entry", 1)
         op.screen_switching(1)
@@ -58,4 +59,5 @@ def op_aborad_c(id: str, password: str) -> MainProcessingResultsType:
 
     
 if __name__ == "__main__":
-    op_aborad_c("kkc4726", "kkc@4726")
+    print("")
+    # op_aborad_c("kkc4726", "kkc@4726", "")
