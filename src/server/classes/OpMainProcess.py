@@ -10,7 +10,7 @@ from typing import Final, Literal, Optional, TypeGuard, Any
 from dataclasses import dataclass, field
 from server.type import ExcelDataFlags, ExcelDataObi, ObiOrderExistsResultsType, ObiOrderExistsType, RuleOp, RuleItems, RuleSuppliers
 from server.type import ExcelDataKoutei, ExcelDataOp, ObiOrderSituationResultsType, ObiOrderSituationType
-from server.function import str_to_datetime, today_str
+from server.function import str_to_datetime, today_str, LT_to_weeks, get_various_weeks, datetime_to_str
 from server.utils import create_excel, get_id
 
 
@@ -52,7 +52,31 @@ class OpMainProcess(Op):
                 excel_data = super().get_data_for_excel(i, "確定")
                 self.update_excel_lib(excel_data)
                 self.add_to_excel_list()
+
+
+    def confirmed_aborat_c(self, i: int) -> None:  
+        super().btn_click(get_id("更新_op_results", i))
+        lt_str = int(super().get_value(get_id("L/T_op_results", i)))
+        lt_weeks = LT_to_weeks(lt_str)
+
+        koutei = OpKoutei(self.brower, self.wait, i, settings_suppliers=self.settings_op["suppliers"])
+        supplier_rule = koutei.start()
+        koutei.set_price_not_setting()
+
+        if koutei.num == 1:
+            normal_delivery_time = get_various_weeks("move", lt_weeks)
+            super().set_value(get_id("納期_op_KOUTEI"), datetime_to_str(normal_delivery_time))
+        else:
+            koutei.end()
+
+        payments = OpPayments(self.brower, self.wait, i)
+        payments.click_only()
         
+        if supplier_rule:
+            self.supplier_rule_process(supplier_rule, i)
+        
+        
+    
 
     def update_excel_lib(self, excel_data: ExcelDataOp | ExcelDataObi | ExcelDataKoutei | ExcelDataFlags) -> None:
         self.excel_lib.update(excel_data)

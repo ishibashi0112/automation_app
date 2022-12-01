@@ -18,7 +18,7 @@ def op_aborad_c(settings_op: RuleOp, id: str, password: str) -> MainProcessingRe
 
             for i, item in enumerate(items_list):
                 #次にみるitemが無い場合
-                if len(item) == 0:
+                if item == []:
                     break
 
                 #備考欄に記載がある場合
@@ -38,6 +38,7 @@ def op_aborad_c(settings_op: RuleOp, id: str, password: str) -> MainProcessingRe
                     op.set_qty(i, qty_checked)
                     
                 op.confirmed_as_it_is(i, is_excel=False)
+                
 
             if  op.check_next_page_exists():
                 op.move_next_page()
