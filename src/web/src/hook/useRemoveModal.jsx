@@ -5,7 +5,7 @@ import { deleteDoc, doc } from "firebase/firestore";
 import React, { useCallback, useState } from "react";
 import { RiCheckFill, RiCloseFill, RiDeleteBin2Line } from "react-icons/ri";
 import { useSWRConfig } from "swr";
-import { db } from "../lib/firebase";
+import { db } from "lib/firebase";
 
 export const useRemoveModal = (collectionName) => {
   const [removeDoc, setRemoveDoc] = useState({});

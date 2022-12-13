@@ -1,27 +1,33 @@
-import React from "react";
+import React, { FC } from "react";
 import { Select, TextInput, Popover, Button } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import { useCallback } from "react";
 import { useEffect, useState } from "react";
 import { RiFilterLine } from "react-icons/ri";
+import { Column } from "@tanstack/react-table";
+import { SettingOpSuplliers } from "types/type";
 
-export const Filter = ({ column }) => {
-  const [value, setValue] = useState("");
+type props = {
+  column: Column<SettingOpSuplliers, unknown>;
+};
+
+export const Filter: FC<props> = ({ column }) => {
+  const [value, setValue] = useState<string | null>("");
   const [debouncedText] = useDebouncedValue(value, 300);
   const headerText = column.columnDef.header;
 
-  const handleOnChange = useCallback((e) => {
-    setValue(e.currentTarget.value);
-  }, []);
+  const handleOnChange: React.ChangeEventHandler<HTMLInputElement> =
+    useCallback((e) => {
+      setValue(e.currentTarget.value);
+    }, []);
 
   useEffect(() => {
     column.setFilterValue(debouncedText);
   }, [debouncedText]);
 
   if (!headerText) {
-    return;
+    return <></>;
   }
-  console.log("Filter");
 
   return (
     <Popover trapFocus>
@@ -47,7 +53,11 @@ export const Filter = ({ column }) => {
             onChange={setValue}
           />
         ) : (
-          <TextInput size="xs" value={value} onChange={handleOnChange} />
+          <TextInput
+            size="xs"
+            value={value as string}
+            onChange={handleOnChange}
+          />
         )}
       </Popover.Dropdown>
     </Popover>

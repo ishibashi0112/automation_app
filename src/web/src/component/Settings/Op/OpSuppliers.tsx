@@ -31,11 +31,13 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { addDoc, collection, doc, updateDoc } from "firebase/firestore";
-import { Filter } from "../Filter";
-import { useRemoveModal } from "../../../hook/useRemoveModal";
-import { useSuppliers } from "../../../hook/useSuppliers";
-import { db } from "../../../lib/firebase";
+import { Filter } from "component/Settings/Filter";
+import { useRemoveModal } from "hook/useRemoveModal";
+import { useSuppliers } from "hook/useSuppliers";
+import { db } from "lib/firebase";
 import { showNotification } from "@mantine/notifications";
+import { FC } from "react";
+import { SettingOpSuplliers } from "types/type";
 
 const columns = [
   {
@@ -60,15 +62,21 @@ const columns = [
   },
 ];
 
-export const OpSuppliers = ({ title }) => {
+type SettingOpSupplierValues = {
+  code: string;
+  name: string;
+  rule: string;
+};
+
+export const OpSuppliers: FC<{ title: string }> = ({ title }) => {
   const [popOpened, setPopOpened] = useState(false);
   const [isLoading, setIsLoading] = useState({ add: false, save: false });
-  const [columnFilters, setColumnFilters] = useState([]);
-  const [updateArray, setUpdateArray] = useState([]);
+  const [columnFilters, setColumnFilters] = useState<SettingOpSuplliers[]>([]);
+  const [updateArray, setUpdateArray] = useState<SettingOpSuplliers[]>([]);
   const { data: suppliers } = useSuppliers();
   const { mutate } = useSWRConfig();
 
-  const form = useForm({
+  const form = useForm<SettingOpSupplierValues>({
     initialValues: {
       code: "",
       name: "",
@@ -87,35 +95,40 @@ export const OpSuppliers = ({ title }) => {
     getFilteredRowModel: getFilteredRowModel(),
   });
 
-  const hadnleSubmit = useCallback(async (values) => {
-    try {
-      setIsLoading((prev) => ({ ...prev, add: true }));
-      await addDoc(collection(db, "suppliers"), { ...values, isApply: true });
-      form.reset();
-      await mutate("suppliers");
-      showNotification({
-        title: "追加処理が正常に完了しました。",
-        message: `品番:${values.code}  ${values.name}を追加しました。`,
-        color: "teal",
-        icon: <RiCheckFill />,
-      });
-    } catch (error) {
-      showNotification({
-        title: "追加に失敗しました。",
-        message: "処理が失敗しました",
-        color: "red",
-        icon: <RiCloseFill />,
-      });
-    } finally {
-      setIsLoading((prev) => ({ ...prev, add: false }));
-    }
-  }, []);
+  const hadnleSubmit = useCallback(
+    async (values: SettingOpSupplierValues): Promise<void> => {
+      try {
+        setIsLoading((prev) => ({ ...prev, add: true }));
+        await addDoc(collection(db, "suppliers"), { ...values, isApply: true });
+        form.reset();
+        await mutate("suppliers");
+        showNotification({
+          title: "追加処理が正常に完了しました。",
+          message: `品番:${values.code}  ${values.name}を追加しました。`,
+          color: "teal",
+          icon: <RiCheckFill />,
+        });
+      } catch (error) {
+        showNotification({
+          title: "追加に失敗しました。",
+          message: "処理が失敗しました",
+          color: "red",
+          icon: <RiCloseFill />,
+        });
+      } finally {
+        setIsLoading((prev) => ({ ...prev, add: false }));
+      }
+    },
+    []
+  );
 
-  const handleClickSave = async () => {
+  const handleClickSave: React.MouseEventHandler<
+    HTMLButtonElement
+  > = async () => {
     try {
       setIsLoading((prev) => ({ ...prev, save: true }));
       await Promise.all(
-        updateArray.map(async (supplier) => {
+        updateArray.map(async (supplier: SettingOpSuplliers) => {
           const { id, ...updateSupplier } = supplier;
           const supplierRef = doc(db, "suppliers", supplier.id);
           await updateDoc(supplierRef, updateSupplier);
@@ -156,9 +169,8 @@ export const OpSuppliers = ({ title }) => {
         <div className="p-2">
           <Popover
             opened={popOpened}
-            onClose={isLoading.add ? null : () => setPopOpened(false)}
+            onClose={isLoading.add ? undefined : () => setPopOpened(false)}
             position="bottom-start"
-            placement="start"
           >
             <Popover.Target>
               <Button
@@ -238,7 +250,7 @@ export const OpSuppliers = ({ title }) => {
                       </div>
                       <div className="inline">
                         {header.column.getCanFilter() ? (
-                          <Filter column={header.column} table={table} />
+                          <Filter column={header.column} />
                         ) : null}
                       </div>
                     </th>
@@ -263,37 +275,41 @@ export const OpSuppliers = ({ title }) => {
   );
 };
 
-const TableRows = ({ row, setUpdateArray }) => {
+const TableRows: FC<{
+  row: any;
+  setUpdateArray: React.Dispatch<React.SetStateAction<SettingOpSuplliers[]>>;
+}> = ({ row, setUpdateArray }) => {
   const { data: suppliers } = useSuppliers();
-  const [isChecked, setIsChecked] = useState(row.original.isApply);
+  const [isChecked, setIsChecked] = useState<boolean>(row.original.isApply);
 
   const { setRemoveDoc, setOpenRemoveModal, modal } =
     useRemoveModal("suppliers");
 
-  const handleOnChange = useCallback(
-    (e) => {
-      setIsChecked((prev) => !prev);
+  const handleOnChange: React.ChangeEventHandler<HTMLInputElement> =
+    useCallback(
+      (e) => {
+        setIsChecked((prev) => !prev);
 
-      const itemId = e.currentTarget.dataset.id;
-      const itemIdFilter = suppliers.filter((item) => item.id === itemId);
-      const updateItem = { ...itemIdFilter[0], isApply: !isChecked };
-      setUpdateArray((prevArray) => {
-        if (!prevArray.length) {
-          return [updateItem];
-        }
-
-        const RemoveDuplicatesArray = prevArray.reduce((prev, current) => {
-          if (current.id === itemId) {
-            return [...prev];
+        const itemId = e.currentTarget.dataset.id;
+        const itemIdFilter = suppliers.filter((item) => item.id === itemId);
+        const updateItem = { ...itemIdFilter[0], isApply: !isChecked };
+        setUpdateArray((prevArray) => {
+          if (!prevArray.length) {
+            return [updateItem];
           }
-          return [...prev, current];
-        }, []);
 
-        return [...RemoveDuplicatesArray, updateItem];
-      });
-    },
-    [isChecked, suppliers]
-  );
+          const RemoveDuplicatesArray = prevArray.reduce((prev, current) => {
+            if (current.id === itemId) {
+              return [...prev];
+            }
+            return [...prev, current];
+          }, []);
+
+          return [...RemoveDuplicatesArray, updateItem];
+        });
+      },
+      [isChecked, suppliers]
+    );
 
   const handleClickRemoveMenu = useCallback((item) => {
     setOpenRemoveModal(true);
