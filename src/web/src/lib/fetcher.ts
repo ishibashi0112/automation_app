@@ -1,11 +1,11 @@
 import { collection, getDocs } from "firebase/firestore";
-import { SettingOpItems } from "types/type";
+import { firestoreCollections } from "types/type";
 import { db } from "./firebase";
-import { converter } from "./firebaseconverter";
+import { converter } from "./firebaseConverter";
 
 // type Fetcher = (url: string) => string[];
 
-export const fetcher = async <T>(url: string) => {
+export const fetcher = async <T extends firestoreCollections>(url: string) => {
   const docSnap = await getDocs(
     collection(db, url).withConverter(converter<T>())
   );

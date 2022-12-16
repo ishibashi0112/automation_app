@@ -1,20 +1,20 @@
 import useSWR, { KeyedMutator } from "swr";
 import { Menu } from "utils/menuData";
 
-const fallbackData = {
+const initialData = {
   title: "",
   description: "",
   formBody: "",
-  runFunc: window.eel.run_automation,
+  runFunc: async () => {},
 };
 
-export const useMenuState = (): // fallbackData: any = null
-[Menu, KeyedMutator<Menu>] => {
-  const { data, mutate } = useSWR<Menu>("menu", { fallbackData });
+export const useMenuState = (): [Menu | undefined, KeyedMutator<Menu>] => {
+  // const { data, mutate } = useSWR<Menu>("menu", { fallbackData });
+  const { data, mutate } = useSWR<Menu>("menu");
 
-  if (!data) {
-    return [fallbackData, mutate];
-  }
+  // if (!data) {
+  //   return [initialData, mutate];
+  // }
 
   return [data, mutate];
 };

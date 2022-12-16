@@ -15,10 +15,10 @@ export const Menu = () => {
             <Text fz="sm">戻る</Text>
           </Flex>
         </UnstyledButton>
-        <Title order={4}>{menu.title}</Title>
+        <Title order={4}>{menu ? menu.title : ""}</Title>
       </div>
 
-      <Card>{menu.formBody}</Card>
+      <Card>{menu ? menu.formBody : ""}</Card>
     </>
   );
 };

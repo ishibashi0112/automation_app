@@ -9,18 +9,18 @@ export const App: FC = () => {
   const { colorScheme } = useDarkMode();
 
   return (
-    <ColorSchemeProvider colorScheme={colorScheme}>
-      <MantineProvider
-        theme={{
-          colorScheme: colorScheme,
-        }}
-        withGlobalStyles
-        withNormalizeCSS
-      >
-        <NotificationsProvider>
-          <Root />
-        </NotificationsProvider>
-      </MantineProvider>
-    </ColorSchemeProvider>
+    // <ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={setDark}>
+    <MantineProvider
+      theme={{
+        colorScheme: colorScheme,
+      }}
+      withGlobalStyles
+      withNormalizeCSS
+    >
+      <NotificationsProvider>
+        <Root />
+      </NotificationsProvider>
+    </MantineProvider>
+    // </ColorSchemeProvider>
   );
 };

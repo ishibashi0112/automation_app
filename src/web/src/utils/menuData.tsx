@@ -10,7 +10,7 @@ import { OpPayments } from "component/Menu/MenuComponets/OpPayments";
 import { InsertText } from "component/Menu/MenuComponets/InsertText";
 import { CreateMailForPaperOrder } from "component/Menu/MenuComponets/CreateMailForPaperOrder";
 import { ItemJudgeEntry } from "component/Menu/MenuComponets/ItemJudgeEntry";
-import { RunAutomation } from "types/global";
+import { Settings } from "types/type";
 
 export type ResultState = {
   state: "error" | "success" | "";
@@ -19,11 +19,17 @@ export type ResultState = {
   type: string;
 };
 
+type RunAutomation = (
+  menuName: string,
+  settings: Settings,
+  params: any
+) => Promise<ResultState>;
+
 export type Menu = {
   title: string;
   description: string;
   formBody: ReactNode;
-  runFunc: RunAutomation;
+  runFunc: RunAutomation | (() => Promise<any>);
 };
 
 const runFunc: RunAutomation = async (menuName, settings, params) => {

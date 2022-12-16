@@ -45,7 +45,17 @@ export const useMenuForm = <
     async (values: typeof form.values) => {
       setIsLoading(true);
       const loadedValues = await values;
-      const settings = { op: { items, suppliers }, schedules };
+      const settings = {
+        op: {
+          items: items ? items : [],
+          suppliers: suppliers ? suppliers : [],
+        },
+        schedules: schedules ? schedules : [],
+      };
+
+      if (!menu) {
+        return;
+      }
 
       const runResult = await menu.runFunc(menu.title, settings, loadedValues);
       setResult(runResult);

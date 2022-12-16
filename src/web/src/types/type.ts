@@ -1,5 +1,3 @@
-import { ResultState } from "utils/menuData";
-
 export type SettingOpItems = {
   id: string;
   isApply: boolean;
@@ -23,9 +21,14 @@ export type SettingSchedules = {
   title: string;
 };
 
+export type firestoreCollections =
+  | SettingOpItems
+  | SettingOpSuplliers
+  | SettingSchedules;
+
 export type Settings = {
-  op: { items: SettingOpItems; suppliers: SettingOpSuplliers };
-  schedules: SettingSchedules;
+  op: { items: SettingOpItems[]; suppliers: SettingOpSuplliers[] };
+  schedules: SettingSchedules[];
 };
 
 export type LoginValues = {
@@ -93,20 +96,7 @@ export type FormValues =
   | OpExcelValues
   | BearingOrderValues;
 
-// export type RunAutomation = (
-//   menuName: string,
-//   settings: Settings,
-//   params: string
-// ) => Promise<ResultState>;
-
 export type OCRResult = {
   info: RepairOrderInfo[];
   images: string[];
 };
-
-// type RepairOrderOCR = (files?: string[]) => OCRResult;
-
-// type Eel = {
-//   run_automation: RunAutomation;
-//   ocr_for_repair_order_pdf: RepairOrderOCR;
-// };

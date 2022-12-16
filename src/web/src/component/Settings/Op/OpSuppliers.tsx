@@ -30,7 +30,13 @@ import {
   getFilteredRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { addDoc, collection, doc, updateDoc } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  doc,
+  DocumentReference,
+  updateDoc,
+} from "firebase/firestore";
 import { Filter } from "component/Settings/Filter";
 import { useRemoveModal } from "hook/useRemoveModal";
 import { useSuppliers } from "hook/useSuppliers";
@@ -71,7 +77,7 @@ type SettingOpSupplierValues = {
 export const OpSuppliers: FC<{ title: string }> = ({ title }) => {
   const [popOpened, setPopOpened] = useState(false);
   const [isLoading, setIsLoading] = useState({ add: false, save: false });
-  const [columnFilters, setColumnFilters] = useState<SettingOpSuplliers[]>([]);
+  const [columnFilters, setColumnFilters] = useState<any>([]);
   const [updateArray, setUpdateArray] = useState<SettingOpSuplliers[]>([]);
   const { data: suppliers } = useSuppliers();
   const { mutate } = useSWRConfig();
@@ -85,7 +91,7 @@ export const OpSuppliers: FC<{ title: string }> = ({ title }) => {
   });
 
   const table = useReactTable({
-    data: suppliers,
+    data: suppliers ? suppliers : [],
     columns,
     state: {
       columnFilters,
@@ -130,7 +136,11 @@ export const OpSuppliers: FC<{ title: string }> = ({ title }) => {
       await Promise.all(
         updateArray.map(async (supplier: SettingOpSuplliers) => {
           const { id, ...updateSupplier } = supplier;
-          const supplierRef = doc(db, "suppliers", supplier.id);
+          const supplierRef = doc(
+            db,
+            "suppliers",
+            supplier.id
+          ) as DocumentReference<SettingOpSuplliers>;
           await updateDoc(supplierRef, updateSupplier);
         })
       );
@@ -290,6 +300,10 @@ const TableRows: FC<{
       (e) => {
         setIsChecked((prev) => !prev);
 
+        if (!suppliers) {
+          return;
+        }
+
         const itemId = e.currentTarget.dataset.id;
         const itemIdFilter = suppliers.filter((item) => item.id === itemId);
         const updateItem = { ...itemIdFilter[0], isApply: !isChecked };
@@ -298,12 +312,15 @@ const TableRows: FC<{
             return [updateItem];
           }
 
-          const RemoveDuplicatesArray = prevArray.reduce((prev, current) => {
-            if (current.id === itemId) {
-              return [...prev];
-            }
-            return [...prev, current];
-          }, []);
+          const RemoveDuplicatesArray = prevArray.reduce(
+            (prev: SettingOpSuplliers[], current: SettingOpSuplliers) => {
+              if (current.id === itemId) {
+                return [...prev];
+              }
+              return [...prev, current];
+            },
+            []
+          );
 
           return [...RemoveDuplicatesArray, updateItem];
         });
@@ -311,21 +328,21 @@ const TableRows: FC<{
       [isChecked, suppliers]
     );
 
-  const handleClickRemoveMenu = useCallback((item) => {
+  const handleClickRemoveMenu = useCallback((item: any) => {
     setOpenRemoveModal(true);
     setRemoveDoc(item);
   }, []);
 
   return (
     <tr key={row.id}>
-      {row.getVisibleCells().map((cell) => (
+      {row.getVisibleCells().map((cell: any) => (
         <td
           className={
             cell.column.columnDef.header === "反映"
               ? "min-w-[80px]"
               : !cell.column.columnDef.header
               ? "max-w-[40px]"
-              : null
+              : ""
           }
           key={cell.id}
         >

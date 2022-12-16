@@ -5,15 +5,15 @@ import {
   SnapshotOptions,
   WithFieldValue,
 } from "firebase/firestore";
+import { firestoreCollections } from "types/type";
 
-export const converter = <T>(): FirestoreDataConverter<T> => ({
+export const converter = <
+  T extends firestoreCollections
+>(): FirestoreDataConverter<T> => ({
   toFirestore: (data: WithFieldValue<T>): DocumentData => {
-    return data as DocumentData;
+    return data;
   },
-  fromFirestore: (
-    snapshot: QueryDocumentSnapshot<T>,
-    option: SnapshotOptions
-  ) => {
+  fromFirestore: (snapshot: QueryDocumentSnapshot<T>, option) => {
     const data = snapshot.data(option);
     return data;
   },
