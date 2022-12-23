@@ -3,7 +3,7 @@ from openpyxl import Workbook
 from openpyxl import styles
 
 def get_id(key: Any, i: int=0) ->  Optional[str]:
-    id_text: Final[str] = f"{i+2}" if len(str(i+2)) == 2 else f"0{i+2}"
+    id_text: Final[str] = f"{i+2}" if len(str(i+2)) > 1 else f"0{i+2}"
 
     element_ids: Final[dict[str, str]] = {
         "新規追加_radio_btn_op_search": "H_dspsl_mode_1",
@@ -69,20 +69,20 @@ def get_id(key: Any, i: int=0) ->  Optional[str]:
         "明細追加_op_footer" : "H_dtl_add_btn",
         "再表示_op_footer" : "H_reload_btn",
         
-        "受注NO_obi_results": f'M1_ctl0{i+2}_H_m1_ordr_slip_no',
-        "行NO_obi_results": f'M1_ctl0{i+2}_H_m1_ordr_ln_no',
-        "数量_obi_results": f"M1_ctl0{i+2}_H_m1_qty",
-        "製番_obi_results": f'M1_ctl0{i+2}_H_m1_prdt_no',
-        "受注担当者_obi_results": f'M1_ctl0{i+2}_H_m1_ordr_prsn_nm',
-        "ｽﾃｰﾀｽ_obi_results": f'M1_ctl0{i+2}_H_m1_stts',
-        "受注数_obi_results": f'M1_ctl0{i+2}_H_m1_qty',
+        "受注NO_obi_results": f'M1_ctl{id_text}_H_m1_ordr_slip_no',
+        "行NO_obi_results": f'M1_ctl{id_text}_H_m1_ordr_ln_no',
+        "数量_obi_results": f"M1_ctl{id_text}_H_m1_qty",
+        "製番_obi_results": f'M1_ctl{id_text}_H_m1_prdt_no',
+        "受注担当者_obi_results": f'M1_ctl{id_text}_H_m1_ordr_prsn_nm',
+        "ｽﾃｰﾀｽ_obi_results": f'M1_ctl{id_text}_H_m1_stts',
+        "受注数_obi_results": f'M1_ctl{id_text}_H_m1_qty',
         "発注数_obi_results": f'H_po_qty',
         "実利1_obi_results": f'H_actual_useful_qty1',
         "実利2_obi_results": f'H_actual_useful_qty2',
-        "区分_obi_results": f'M1_ctl0{i+2}_H_m1_kbn',
-        "修理日_obi_results": f'M1_ctl0{i+2}_H_m1_rpr_schdl_dt',
-        "客先ｺｰﾄﾞ_obi_results": f'M1_ctl0{i+2}_H_m1_dlvry_to_cd',
-        "客先名_obi_results": f'M1_ctl0{i+2}_H_m1_dlvry_to_nm',
+        "区分_obi_results": f'M1_ctl{id_text}_H_m1_kbn',
+        "修理日_obi_results": f'M1_ctl{id_text}_H_m1_rpr_schdl_dt',
+        "客先ｺｰﾄﾞ_obi_results": f'M1_ctl{id_text}_H_m1_dlvry_to_cd',
+        "客先名_obi_results": f'M1_ctl{id_text}_H_m1_dlvry_to_nm',
         "取引種別_obi_results": f'M1_ctl{id_text}_H_m1_dlng_type',
 
         "品番_ha_search": "H_item_cd",

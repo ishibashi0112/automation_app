@@ -32,8 +32,6 @@ class Obi(ServiceSystemOperation):
 
     def get_results_order_list(self) -> ObiResultsOrderType:
         results_items_list = super().get_elements("xpath", get_xpath("検索結果_obi_results"))
-        del results_items_list[:3]
-
         results_order_list_upper_line = list(filter(lambda el: el.get_attribute("class") , results_items_list))
         results_order_list_bottom_line = list(filter(lambda el: not el.get_attribute("class") , results_items_list))
         

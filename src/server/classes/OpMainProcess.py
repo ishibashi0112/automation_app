@@ -145,7 +145,7 @@ class OpMainProcess(Op):
                 is_result = obi.search()
                 if not is_result:
                     super().screen_switching(1)
-                    self.delete_and_add_excel_data(i, "web 受注残無し")  
+                    self.delete_and_add_excel_data(i, "受注残無し")  
                     
                     return
          
