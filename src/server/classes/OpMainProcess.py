@@ -54,8 +54,12 @@ class OpMainProcess(Op):
                 self.add_to_excel_list()
 
 
-    def confirmed_aborat_c(self, i: int) -> None:  
+    def aborat_c_procces_with_change_delivery_time(self, i: int,) -> None:  
         super().btn_click(get_id("更新_op_results", i))
+
+        payments = OpPayments(self.brower, self.wait, i)
+        payments.click_only()
+
         lt_str = int(super().get_value(get_id("L/T_op_results", i)))
         lt_weeks = LT_to_weeks(lt_str)
 
@@ -63,17 +67,31 @@ class OpMainProcess(Op):
         supplier_rule = koutei.start()
         koutei.set_price_not_setting()
 
+        if supplier_rule:
+            koutei.end()
+            self.supplier_rule_process(supplier_rule, i)
+
+            return
+
         if koutei.num == 1:
             normal_delivery_time = get_various_weeks("move", lt_weeks)
             super().set_value(get_id("納期_op_KOUTEI"), datetime_to_str(normal_delivery_time))
+
+            koutei_excel_data = koutei.get_data_for_excel()     
+            self.update_excel_lib(koutei_excel_data)
+            koutei.end()
+            
+            super().btn_click(get_id("確定check_op_results", i))
+
+            excel_data = super().get_data_for_excel(i, "確定")
+            self.update_excel_lib(excel_data)
+            self.add_to_excel_list()
+            
         else:
             koutei.end()
+            super().set_value(get_id("備考_op_results", i), "L/T修正時、複数工程のため保留")
 
-        payments = OpPayments(self.brower, self.wait, i)
-        payments.click_only()
-        
-        if supplier_rule:
-            self.supplier_rule_process(supplier_rule, i)
+
         
         
     

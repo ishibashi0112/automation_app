@@ -36,6 +36,10 @@ export type LoginValues = {
   password: string;
 };
 
+export type OpCValues = LoginValues & {
+  isChangeDeliveryTime: boolean;
+};
+
 export type OpValues = LoginValues & {
   startPage: number;
   nameInitial: string;

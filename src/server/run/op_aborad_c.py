@@ -6,8 +6,8 @@ from server.function import error_action, success_action, today_str
 from server.utils import get_id
 from server.type import RuleOp
 
-def op_aborad_c(settings_op: RuleOp, id: str, password: str) -> MainProcessingResultsType:
-    op = OpMainProcess(id, password, settings_op=settings_op)
+def op_aborad_c(settings_op: RuleOp, id: str, password: str, isChangeDeliveryTime: bool) -> MainProcessingResultsType:
+    op = OpMainProcess(id, password, settings_op=settings_op, op_type="海外")
     try:
         op.menu_open("op_entry", 1)
         op.screen_switching(1)
@@ -36,8 +36,12 @@ def op_aborad_c(settings_op: RuleOp, id: str, password: str) -> MainProcessingRe
                     qty = int(op.get_value(get_id("数量_op_results", i)).replace(',', ''))
                     qty_checked = op.check_qty_and_lot(i, qty)
                     op.set_qty(i, qty_checked)
-                    
-                op.confirmed_as_it_is(i, is_excel=False)
+                
+
+                if isChangeDeliveryTime:
+                    op.aborat_c_procces_with_change_delivery_time(i)
+                else:
+                    op.confirmed_as_it_is(i, is_excel=False)
                 
 
             if  op.check_next_page_exists():
